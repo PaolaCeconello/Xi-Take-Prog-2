@@ -19,7 +19,7 @@ int main(){
 	ALLEGRO_DISPLAY* disp = al_create_display(window_w, window_h);
 	ALLEGRO_BITMAP *backgroundBack = al_load_bitmap("Layers/back.png");
 	ALLEGRO_BITMAP *backgroundMiddle = al_load_bitmap("Layers/middle.png");	
-	ALLEGRO_BITMAP *plataformTexture = al_load_bitmap("Layers/tiles.png");						//Cria uma janela para o programa, define a largura (x) e a altura (y) da tela em píxeis (320x320, neste caso)
+	ALLEGRO_BITMAP *plataformTexture = al_load_bitmap("Layers/tilescontinue.png");						//Cria uma janela para o programa, define a largura (x) e a altura (y) da tela em píxeis (320x320, neste caso)
 
 	al_register_event_source(queue, al_get_keyboard_event_source());				//Indica que eventos de teclado serão inseridos na nossa fila de eventos
 	al_register_event_source(queue, al_get_display_event_source(disp));				//Indica que eventos de tela serão inseridos na nossa fila de eventos
@@ -39,8 +39,9 @@ int main(){
 	float floor_h = al_get_bitmap_height(plataformTexture);
 	plataform *floor = create_plataform(floor_w, 700, window_w, window_h);
 
-	float escalaFloor = (float)window_h/ floor_h;
-	float floorregular = floor_w * escalaFloor; 
+	
+	float floorregularW = floor_w; //176
+	float floorregularH = floor_h; //96
 	
 	ALLEGRO_EVENT event;															//Variável que guarda um evento capturado, sua estrutura é definida em: https://www.allegro.cc/manual/5/ALLEGRO_EVENT
 	al_start_timer(timer);															//Função que inicializa o relógio do programa
@@ -58,16 +59,16 @@ int main(){
     			al_draw_scaled_bitmap(backgroundMiddle, 0, 0, bgMiddle_w, bgMiddle_h, x, 0, bgMiddleregular, window_h, 0);							//Substitui tudo que estava desenhado na tela por um fundo preto
 			}
 			
-			/*for (float x = 0; x < window_w; x += floorregular) {
-    			al_draw_scaled_bitmap(plataformTexture, 0, 0, floor_w, floor_h, x, (window_h-floorregular), floor_h* escalaFloor,floor_w* escalaFloor, 0);							//Substitui tudo que estava desenhado na tela por um fundo preto
-			}*/
+			for (float x = 0; x < window_w; x += floorregularW) {
+    			al_draw_scaled_bitmap(plataformTexture, 0, 0, floor_w, floor_h, x, (window_h - floor_h), floor_w, floor_h, 0);							//Substitui tudo que estava desenhado na tela por um fundo preto
+			}
 
-			float novo_floor_w = 250.0; 
+			/*float novo_floor_w = 250.0; 
 			float novo_floor_h = 250.0; 
 
 			for (float x = 0; x < 960; x += novo_floor_w) {
     		al_draw_scaled_bitmap(plataformTexture, 0, 0, 96, 96, x, (540 - novo_floor_h), novo_floor_w, novo_floor_h, 0);                            
-			}	
+			}*/	
 			
 			al_flip_display();														//Insere as modificações realizadas nos buffers de tela
 		}
