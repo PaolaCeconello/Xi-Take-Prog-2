@@ -5,8 +5,8 @@
 #include "Player.h"
 #include "Plataform.h"
 
-#define window_h 720  //Biblioteca de fontes do Allegro
-#define window_w 1280
+#define window_h 540 //Biblioteca de fontes do Allegro
+#define window_w 960
 
 int main(){
 	al_init();																		//Faz a preparação de requisitos da biblioteca Allegro
@@ -34,13 +34,13 @@ int main(){
 
 	float bgBackregular = bgBack_w * escalaBack;
 	float bgMiddleregular = bgMiddle_w * escalaMiddle;
-	
+
 	float floor_w = al_get_bitmap_width(plataformTexture);
 	float floor_h = al_get_bitmap_height(plataformTexture);
 	plataform *floor = create_plataform(floor_w, 700, window_w, window_h);
 
-	//float escalaFloor = (float)window_h / floor_h;
-	//float floorregular = floor_w * escalaFloor; 
+	float escalaFloor = (float)window_h/ floor_h;
+	float floorregular = floor_w * escalaFloor; 
 	
 	ALLEGRO_EVENT event;															//Variável que guarda um evento capturado, sua estrutura é definida em: https://www.allegro.cc/manual/5/ALLEGRO_EVENT
 	al_start_timer(timer);															//Função que inicializa o relógio do programa
@@ -58,9 +58,16 @@ int main(){
     			al_draw_scaled_bitmap(backgroundMiddle, 0, 0, bgMiddle_w, bgMiddle_h, x, 0, bgMiddleregular, window_h, 0);							//Substitui tudo que estava desenhado na tela por um fundo preto
 			}
 			
-			for (float x = 0; x < window_w; x += floor_w) {
-    			al_draw_scaled_bitmap(plataformTexture, 0, 0, floor_w, floor_h, x, 0, floor_w, window_h, 0);							//Substitui tudo que estava desenhado na tela por um fundo preto
-			}
+			/*for (float x = 0; x < window_w; x += floorregular) {
+    			al_draw_scaled_bitmap(plataformTexture, 0, 0, floor_w, floor_h, x, (window_h-floorregular), floor_h* escalaFloor,floor_w* escalaFloor, 0);							//Substitui tudo que estava desenhado na tela por um fundo preto
+			}*/
+
+			float novo_floor_w = 250.0; 
+			float novo_floor_h = 250.0; 
+
+			for (float x = 0; x < 960; x += novo_floor_w) {
+    		al_draw_scaled_bitmap(plataformTexture, 0, 0, 96, 96, x, (540 - novo_floor_h), novo_floor_w, novo_floor_h, 0);                            
+			}	
 			
 			al_flip_display();														//Insere as modificações realizadas nos buffers de tela
 		}
