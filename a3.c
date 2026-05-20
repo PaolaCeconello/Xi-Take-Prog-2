@@ -9,18 +9,21 @@
 
 #define window_h 540 //Biblioteca de fontes do Allegro
 #define window_w 960
+#define camera_speed 5
 
 
-void update_loacation(player *player)
+void update_loacation(player *player, int *camera_x)
 { 
 	if (player->control->left){																																											//Se o botão de movimentação para esquerda do controle do primeiro jogador está ativado...
 			player_move(player, 1, 0, window_w, window_h);
-			player-> turning_left = 1;																																				//Move o quadrado do primeiro jogador para a esquerda
+			player-> turning_left = 1;
+			*camera_x -= camera_speed;																																				//Move o quadrado do primeiro jogador para a esquerda
 			//if (collision_2D(player_1, player_2)) square_move(player_1, -1, 0, X_SCREEN, Y_SCREEN);																												//Se o movimento causou uma colisão entre quadrados, desfaça o mesmo
 		}
 		if (player->control->right){																																											//Se o botão de movimentação para direita do controle do primeir ojogador está ativado...
 			player_move(player, 1, 1, window_w, window_h);
-			player-> turning_left = 0;																																					//Move o quadrado do primeiro jogador para a direta
+			player-> turning_left = 0;	
+			*camera_x += camera_speed;																																				//Move o quadrado do primeiro jogador para a direta
 			//if (collision_2D(player_1, player_2)) square_move(player_1, -1, 1, X_SCREEN, Y_SCREEN);																												//Se o movimento causou uma colisão entre quadrados, desfaça o mesmo
 		}
 		if (player->control->up) {																																											//Se o botão de movimentação para cima do controle do primeiro jogador está ativado...
@@ -72,6 +75,10 @@ int main(){
 	float floorregularW = floor_w; 
 	float floorregularH = floor_h; 
 	
+	int camera_x = 0;
+	int camera_count = ((float)window_w/bgMiddleregular)+1;
+	//int start_x = -(camera_x % (int) bgMiddleregular);
+	
 	player *player = create_player(48, 48, 60, 300, window_w, window_h);
 	
 	ALLEGRO_EVENT event;															//Variável que guarda um evento capturado, sua estrutura é definida em: https://www.allegro.cc/manual/5/ALLEGRO_EVENT
@@ -83,20 +90,27 @@ int main(){
 		{														//O evento tipo 30 indica um evento de relógio, ou seja, verificação se a tela deve ser atualizada (conceito de FPS)
 			al_clear_to_color(al_map_rgb(0, 0, 0)); // Clear screen first
 			
+			update_loacation(player, &camera_x);
+			
 			for (float x = 0; x < window_w; x += bgBackregular) {
     			al_draw_scaled_bitmap(backgroundBack, 0, 0, bgBack_w, bgBack_h, x, 0, bgBackregular, window_h, 0);							//Substitui tudo que estava desenhado na tela por um fundo preto
 			}
 			
-			for (float x = 0; x < window_w; x += bgMiddleregular) {
-    			al_draw_scaled_bitmap(backgroundMiddle, 0, 0, bgMiddle_w, bgMiddle_h, x, 0, bgMiddleregular, window_h, 0);							//Substitui tudo que estava desenhado na tela por um fundo preto
+			int i = 0;
+			int start_x = -(camera_x % (int) bgMiddleregular);
+			while(i < camera_count+1)
+			{
+				int x = start_x + (i * bgMiddleregular);
+				
+				al_draw_scaled_bitmap(backgroundMiddle, 0, 0, bgMiddle_w, bgMiddle_h, x, 0, bgMiddleregular, window_h, 0);
+			
+				i++;
 			}
 			
 			for (float x = 0; x < window_w; x += floorregularW) {
     			al_draw_scaled_bitmap(plataformTexture, 0, 0, floor_w, floor_h, x, (window_h - floor_h), floor_w, floor_h, 0);							//Substitui tudo que estava desenhado na tela por um fundo preto
 			}
 
-			update_loacation(player);
-			
 			int ALLEGRO_FLIP_HORIZONTAL = player-> turning_left;
 			al_draw_scaled_bitmap(playerSprite, 0, 0, 48, 48,player-> x-player-> w/2, player-> y-player-> h/2,96,96, ALLEGRO_FLIP_HORIZONTAL);
 			
