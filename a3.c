@@ -1,15 +1,16 @@
-//Compilação: gcc a3.c Player.c Plataform.c Joystick.c -o jogo $(pkg-config allegro-5 allegro_main-5 allegro_font-5 allegro_image-5 allegro_primitives-5 --libs --cflags)
+//Compilação: gcc a3.c Player.c Plataform.c Joystick.c BackGroundParallax.c -o jogo $(pkg-config allegro-5 allegro_main-5 allegro_font-5 allegro_image-5 allegro_primitives-5 --libs --cflags)
 #include <stdio.h>
 #include <stdlib.h>
-#include <allegro5/allegro5.h>														//Biblioteca base do Allegro
+#include <allegro5/allegro5.h>														
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
 #include "Player.h"
 #include "Plataform.h"
+#include "BackGroungParallax.h"
 
-#define window_h 540 //Biblioteca de fontes do Allegro
+#define window_h 540
 #define window_w 960
-#define camera_speed 5
+#define camera_speed 8
 
 
 void update_loacation(player *player, int *camera_x)
@@ -47,6 +48,7 @@ int main(){
 	ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);								//Cria o relógio do jogo; isso indica quantas atualizações serão realizadas por segundo (30, neste caso)
 	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();							//Cria a fila de eventos; todos os eventos (programação orientada a eventos) 
 	ALLEGRO_FONT* font = al_create_builtin_font();									//Carrega uma fonte padrão para escrever na tela (é bitmap, mas também suporta adicionar fontes ttf)
+	
 	ALLEGRO_DISPLAY* disp = al_create_display(window_w, window_h);
 	ALLEGRO_BITMAP *backgroundBack = al_load_bitmap("Layers/back.png");
 	ALLEGRO_BITMAP *backgroundMiddle = al_load_bitmap("Layers/middle.png");	
@@ -61,53 +63,53 @@ int main(){
 	float bgBack_w = al_get_bitmap_width(backgroundBack);
 	float bgMiddle_h = al_get_bitmap_height(backgroundMiddle);
 	float bgMiddle_w = al_get_bitmap_width (backgroundMiddle);
+	
 	float escalaBack = (float)window_h / bgBack_h;
 	float escalaMiddle = (float)window_h / bgMiddle_h;
 
-	float bgBackregular = bgBack_w * escalaBack;
-	float bgMiddleregular = bgMiddle_w * escalaMiddle;
+	float bgBackAjustado = bgBack_w * escalaBack;
+	float bgMiddleAjustado = bgMiddle_w * escalaMiddle;
 
 	float floor_w = al_get_bitmap_width(plataformTexture);
 	float floor_h = al_get_bitmap_height(plataformTexture);
-	plataform *floor = create_plataform(floor_w, 700, window_w, window_h);
+	//plataform *floor = create_plataform(floor_w, 700, window_w, window_h);
 
-	
-	float floorregularW = floor_w; 
-	float floorregularH = floor_h; 
-	
 	int camera_x = 0;
-	int camera_count = ((float)window_w/bgMiddleregular)+1;
-	//int start_x = -(camera_x % (int) bgMiddleregular);
+	int camera_count = ((float)window_w/bgMiddleAjustado) +1;
 	
 	player *player = create_player(48, 48, 60, 300, window_w, window_h);
 	
 	ALLEGRO_EVENT event;															//Variável que guarda um evento capturado, sua estrutura é definida em: https://www.allegro.cc/manual/5/ALLEGRO_EVENT
 	al_start_timer(timer);															//Função que inicializa o relógio do programa
+	
 	while(1){																		//Laço principal do programa
 		al_wait_for_event(queue, &event);											//Função que captura eventos da fila, inserindo os mesmos na variável de eventos
 		
 		if (event.type == 30)
 		{														//O evento tipo 30 indica um evento de relógio, ou seja, verificação se a tela deve ser atualizada (conceito de FPS)
-			al_clear_to_color(al_map_rgb(0, 0, 0)); // Clear screen first
+			al_clear_to_color(al_map_rgb(0, 0, 0)); 
 			
 			update_loacation(player, &camera_x);
 			
-			for (float x = 0; x < window_w; x += bgBackregular) {
-    			al_draw_scaled_bitmap(backgroundBack, 0, 0, bgBack_w, bgBack_h, x, 0, bgBackregular, window_h, 0);							//Substitui tudo que estava desenhado na tela por um fundo preto
+			for (float x = 0; x < window_w; x += bgBackAjustado) 
+			{
+    			al_draw_scaled_bitmap(backgroundBack, 0, 0, bgBack_w, bgBack_h, x, 0, bgBackAjustado, window_h, 0);							//Substitui tudo que estava desenhado na tela por um fundo preto
 			}
 			
-			int i = 0;
-			int start_x = -(camera_x % (int) bgMiddleregular);
+			/*int i = 0;
+			int start_x = -(camera_x % (int) bgMiddleAjustado);
 			while(i < camera_count+1)
 			{
-				int x = start_x + (i * bgMiddleregular);
+				int x = start_x + (i * bgMiddleAjustado);
 				
-				al_draw_scaled_bitmap(backgroundMiddle, 0, 0, bgMiddle_w, bgMiddle_h, x, 0, bgMiddleregular, window_h, 0);
+				al_draw_scaled_bitmap(backgroundMiddle, 0, 0, bgMiddle_w, bgMiddle_h, x, 0, bgMiddleAjustado, window_h, 0);
 			
 				i++;
-			}
+			}*/
 			
-			for (float x = 0; x < window_w; x += floorregularW) {
+			MiddleGroundParallax(camera_x, camera_count,bgMiddle_w, bgMiddle_h, bgMiddleAjustado, backgroundMiddle, window_h);
+			
+			for (float x = 0; x < window_w; x += floor_w) {
     			al_draw_scaled_bitmap(plataformTexture, 0, 0, floor_w, floor_h, x, (window_h - floor_h), floor_w, floor_h, 0);							//Substitui tudo que estava desenhado na tela por um fundo preto
 			}
 
