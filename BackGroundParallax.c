@@ -4,6 +4,9 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
 
+#include "Player.h"
+
+
 void FloorParallax (int camera_x, int camera_count, float floor_w, float floor_h, ALLEGRO_BITMAP *plataformTexture,int window_h)
 {
     int i = 0;
@@ -23,7 +26,7 @@ void FloorParallax (int camera_x, int camera_count, float floor_w, float floor_h
     return;
 }
 
-void MiddleGroundParallax (int camera_x, int camera_count, float bgMiddle_w, float bgMiddle_h, float bgMiddleAjustado, ALLEGRO_BITMAP *backgroundMiddle,int window_h)
+void MiddleGroundParallax (player *player, int camera_x, int camera_count, float bgMiddle_w, float bgMiddle_h, float bgMiddleAjustado, ALLEGRO_BITMAP *backgroundMiddle,int window_h)
 {
     int i = 0;
 	int start_x = (camera_x % (int)bgMiddleAjustado);
@@ -59,4 +62,13 @@ void BackGroundParallax (int camera_x, int camera_count, float bgBack_w, float b
 			i++;
 		}
     return;
+}
+
+void destroy_backgorund (ALLEGRO_BITMAP *plataformTexture, ALLEGRO_BITMAP *backgroundMiddle, ALLEGRO_BITMAP *backgroundBack)
+{
+	al_destroy_bitmap(backgroundBack);		
+	al_destroy_bitmap(backgroundMiddle);
+	al_destroy_bitmap(plataformTexture);
+
+	return;
 }

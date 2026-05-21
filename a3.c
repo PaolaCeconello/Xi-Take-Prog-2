@@ -20,17 +20,25 @@ void update_loacation(player *player, int *camera_xM, int *camera_xB, int *camer
 	if (player-> control-> left){																																											//Se o botão de movimentação para esquerda do controle do primeiro jogador está ativado...
 			player_move(player, 1, 0, window_w, window_h);
 			player-> turning_left = 1;
-			*camera_xM -= camera_speedM;
-			*camera_xB -= camera_speedB;
-			*camera_xF -= camera_speedF;																																			//Move o quadrado do primeiro jogador para a esquerda
+				
+			if(player-> x <=320 || player-> x >= 640)
+			{
+				*camera_xM -= camera_speedM;
+				*camera_xB -= camera_speedB;
+				*camera_xF -= camera_speedF;
+			}																																			//Move o quadrado do primeiro jogador para a esquerda
 			//if (collision_2D(player_1, player_2)) square_move(player_1, -1, 0, X_SCREEN, Y_SCREEN);																												//Se o movimento causou uma colisão entre quadrados, desfaça o mesmo
 		}
 		if (player->control->right){																																											//Se o botão de movimentação para direita do controle do primeir ojogador está ativado...
 			player_move(player, 1, 1, window_w, window_h);
 			player-> turning_left = 0;	
-			*camera_xM += camera_speedM;
-			*camera_xB += camera_speedB;
-			*camera_xF += camera_speedF;																																				//Move o quadrado do primeiro jogador para a direta
+			
+			if(player-> x <=320 || player-> x >= 640)
+			{	
+				*camera_xM += camera_speedM;
+				*camera_xB += camera_speedB;
+				*camera_xF += camera_speedF;																																				//Move o quadrado do primeiro jogador para a direta
+			}
 			//if (collision_2D(player_1, player_2)) square_move(player_1, -1, 1, X_SCREEN, Y_SCREEN);																												//Se o movimento causou uma colisão entre quadrados, desfaça o mesmo
 		}
 		if (player->control->up) {																																											//Se o botão de movimentação para cima do controle do primeiro jogador está ativado...
@@ -86,7 +94,7 @@ int main(){
 	int camera_countM = ((float)window_w/bgMiddleAjustado) +1;
 	int camera_countB = ((float)window_w/bgBackAjustado) +1;
 	
-	player *player = create_player(48, 48, 60, 300, window_w, window_h);
+	player *player = create_player(48, 48, 50, window_h/2, window_w, window_h);
 	
 	ALLEGRO_EVENT event;															//Variável que guarda um evento capturado, sua estrutura é definida em: https://www.allegro.cc/manual/5/ALLEGRO_EVENT
 	al_start_timer(timer);															//Função que inicializa o relógio do programa
@@ -100,32 +108,10 @@ int main(){
 			
 			update_loacation(player, &camera_xM, &camera_xB, &camera_xF);
 			
-			/*for (float x = 0; x < window_w; x += bgBackAjustado) 
-			{
-    			al_draw_scaled_bitmap(backgroundBack, 0, 0, bgBack_w, bgBack_h, x, 0, bgBackAjustado, window_h, 0);							//Substitui tudo que estava desenhado na tela por um fundo preto
-			}*/
-			
-			/*int i = 0;
-			int start_x = -(camera_x % (int) bgMiddleAjustado);
-			while(i < camera_count+1)
-			{
-				int x = start_x + (i * bgMiddleAjustado);
-				
-				al_draw_scaled_bitmap(backgroundMiddle, 0, 0, bgMiddle_w, bgMiddle_h, x, 0, bgMiddleAjustado, window_h, 0);
-			
-				i++;
-			}*/
-			
 			BackGroundParallax(camera_xB, camera_countB, bgBack_w, bgBack_h, bgBackAjustado, backgroundBack, window_h);
-			
-			MiddleGroundParallax(camera_xM, camera_countM,bgMiddle_w, bgMiddle_h, bgMiddleAjustado, backgroundMiddle, window_h);
-			
-			/*for (float x = 0; x < window_w; x += floor_w) {
-    			al_draw_scaled_bitmap(plataformTexture, 0, 0, floor_w, floor_h, x, (window_h - floor_h), floor_w, floor_h, 0);							//Substitui tudo que estava desenhado na tela por um fundo preto
-			}*/
-
+			MiddleGroundParallax(player, camera_xM, camera_countM,bgMiddle_w, bgMiddle_h, bgMiddleAjustado, backgroundMiddle, window_h);
 			FloorParallax (camera_xF, camera_countF, floor_w, floor_h, plataformTexture,window_h);
-			
+
 			int ALLEGRO_FLIP_HORIZONTAL = player-> turning_left;
 			al_draw_scaled_bitmap(playerSprite, 0, 0, 48, 48,player-> x-player-> w/2, player-> y-player-> h/2,96,96, ALLEGRO_FLIP_HORIZONTAL);
 			
@@ -151,9 +137,8 @@ int main(){
 	al_destroy_display(disp);														//Destrutor da tela
 	al_destroy_timer(timer);														//Destrutor do relógio
 	al_destroy_event_queue(queue);
-	al_destroy_bitmap(backgroundBack);		
-	al_destroy_bitmap(backgroundMiddle);
-	al_destroy_bitmap(plataformTexture);
+	
+	destroy_backgorund (plataformTexture, backgroundMiddle, backgroundBack);
 	destroy_player(player);
 												
 
