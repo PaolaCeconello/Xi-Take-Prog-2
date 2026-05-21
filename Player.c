@@ -24,25 +24,25 @@ player* create_player (unsigned short h, unsigned short w, unsigned short x, uns
 
 void player_move(player *element, char steps, unsigned char trajectory, unsigned short max_x, unsigned short max_y){									//Implementação da função "square_move"
 
-	if (!trajectory)
+	if (trajectory == 0)
     { 
-        if ((element->x - steps *PLAYER_STEP) - element-> w/2 >= 0) 
-        element->x = element->x - steps*PLAYER_STEP;
+        if ((element-> x - steps *PLAYER_STEP) - element-> w/2 >= 0) 
+            element->x = element->x - steps*PLAYER_STEP;
     } 						//Verifica se a movimentação para a esquerda é desejada e possível; se sim, efetiva a mesma
 	else if (trajectory == 1)
     { 
         if ((element->x + steps *PLAYER_STEP) + element-> w/2 <= max_x)
-         element->x = element->x + steps*PLAYER_STEP;
+            element->x = element->x + steps*PLAYER_STEP;
     }			//Verifica se a movimentação para a direita é desejada e possível; se sim, efetiva a mesma
 	else if (trajectory == 2)
     { 
         if ((element->y - steps *PLAYER_STEP) - element-> h/2 >= 0) 
-        element->y = element->y - steps*PLAYER_STEP;
+            element->y = element->y - steps*PLAYER_STEP;
     }				//Verifica se a movimentação para cima é desejada e possível; se sim, efetiva a mesma
 	else if (trajectory == 3)
     { 
         if ((element->y + steps *PLAYER_STEP) + element-> h/2 <= max_y) 
-        element->y = element->y + steps*PLAYER_STEP;
+            element->y = element->y + steps*PLAYER_STEP;
     }			//Verifica se a movimentação para baixo é desejada e possível; se sim, efetiva a mesma
 }
 
