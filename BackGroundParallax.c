@@ -26,7 +26,7 @@ void FloorParallax (int camera_x, int camera_count, float floor_w, float floor_h
     return;
 }
 
-void MiddleGroundParallax (player *player, int camera_x, int camera_count, float bgMiddle_w, float bgMiddle_h, float bgMiddleAjustado, ALLEGRO_BITMAP *backgroundMiddle,int window_h)
+void MiddleGroundParallax (int camera_x, int camera_count, float bgMiddle_w, float bgMiddle_h, float bgMiddleAjustado, ALLEGRO_BITMAP *backgroundMiddle,int window_h)
 {
     int i = 0;
 	int start_x = (camera_x % (int)bgMiddleAjustado);

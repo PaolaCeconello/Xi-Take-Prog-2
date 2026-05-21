@@ -22,11 +22,11 @@ player* create_player (unsigned short h, unsigned short w, unsigned short x, uns
     return (new_player);
 }
 
-void player_move(player *element, char steps, unsigned char trajectory, unsigned short max_x, unsigned short max_y){									//Implementação da função "square_move"
+void player_move(player *element, char steps, unsigned char trajectory, unsigned short max_x, unsigned short max_y) {									//Implementação da função "square_move"
 
 	if (trajectory == 0)
     { 
-        if ((element-> x - steps *PLAYER_STEP) - element-> w/2 >= 0) 
+        if ((element-> x - steps *PLAYER_STEP) - element-> w/2 >= tropicL) 
             element->x = element->x - steps*PLAYER_STEP;
     } 						//Verifica se a movimentação para a esquerda é desejada e possível; se sim, efetiva a mesma
 	else if (trajectory == 1)

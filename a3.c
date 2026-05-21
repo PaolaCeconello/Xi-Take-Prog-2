@@ -6,13 +6,14 @@
 #include <allegro5/allegro_image.h>
 #include "Player.h"
 #include "Plataform.h"
-#include "BackGroungParallax.h"
+#include "BackGroundParallax.h"
 
 #define window_h 540
 #define window_w 960
 #define camera_speedF 10
-#define camera_speedM 5
-#define camera_speedB 2
+#define camera_speedM 9
+#define camera_speedB 3
+
 
 
 void update_loacation(player *player, int *camera_xM, int *camera_xB, int *camera_xF)
@@ -21,7 +22,7 @@ void update_loacation(player *player, int *camera_xM, int *camera_xB, int *camer
 			player_move(player, 1, 0, window_w, window_h);
 			player-> turning_left = 1;
 				
-			if(player-> x <=320 || player-> x >= 640)
+			if (player-> x >= tropicL && player-> x < tropicR)
 			{
 				*camera_xM -= camera_speedM;
 				*camera_xB -= camera_speedB;
@@ -29,16 +30,19 @@ void update_loacation(player *player, int *camera_xM, int *camera_xB, int *camer
 			}																																			//Move o quadrado do primeiro jogador para a esquerda
 			//if (collision_2D(player_1, player_2)) square_move(player_1, -1, 0, X_SCREEN, Y_SCREEN);																												//Se o movimento causou uma colisão entre quadrados, desfaça o mesmo
 		}
-		if (player->control->right){																																											//Se o botão de movimentação para direita do controle do primeir ojogador está ativado...
-			player_move(player, 1, 1, window_w, window_h);
-			player-> turning_left = 0;	
+		if (player->control->right)
+		{																																											//Se o botão de movimentação para direita do controle do primeir ojogador está ativado...
+			player_move(player, 1, 1, tropicR, window_h);
+			player-> turning_left = 0;
 			
-			if(player-> x <=320 || player-> x >= 640)
+			if (player-> x > tropicL && player-> x <= tropicR)
 			{	
 				*camera_xM += camera_speedM;
 				*camera_xB += camera_speedB;
 				*camera_xF += camera_speedF;																																				//Move o quadrado do primeiro jogador para a direta
 			}
+		
+			
 			//if (collision_2D(player_1, player_2)) square_move(player_1, -1, 1, X_SCREEN, Y_SCREEN);																												//Se o movimento causou uma colisão entre quadrados, desfaça o mesmo
 		}
 		if (player->control->up) {																																											//Se o botão de movimentação para cima do controle do primeiro jogador está ativado...
@@ -109,7 +113,7 @@ int main(){
 			update_loacation(player, &camera_xM, &camera_xB, &camera_xF);
 			
 			BackGroundParallax(camera_xB, camera_countB, bgBack_w, bgBack_h, bgBackAjustado, backgroundBack, window_h);
-			MiddleGroundParallax(player, camera_xM, camera_countM,bgMiddle_w, bgMiddle_h, bgMiddleAjustado, backgroundMiddle, window_h);
+			MiddleGroundParallax(camera_xM, camera_countM,bgMiddle_w, bgMiddle_h, bgMiddleAjustado, backgroundMiddle, window_h);
 			FloorParallax (camera_xF, camera_countF, floor_w, floor_h, plataformTexture,window_h);
 
 			int ALLEGRO_FLIP_HORIZONTAL = player-> turning_left;

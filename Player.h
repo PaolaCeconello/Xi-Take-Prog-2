@@ -6,7 +6,9 @@
 #include <stdbool.h>
 #include "Joystick.h"
 
-#define PLAYER_STEP 8																															//Tamanho, em pixels, de um passo do quadrado
+#define PLAYER_STEP 10
+#define tropicR window_w/2
+#define tropicL 960/10																															//Tamanho, em pixels, de um passo do quadrado
 
 typedef struct 
 {																																	//Definição da estrutura de um quadrado
