@@ -4,9 +4,6 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
 
-#include "Player.h"
-
-
 void FloorParallax (int camera_x, int camera_count, float floor_w, float floor_h, ALLEGRO_BITMAP *plataformTexture,int window_h)
 {
     int i = 0;

@@ -7,53 +7,72 @@
 #include "Player.h"
 #include "Plataform.h"
 #include "BackGroundParallax.h"
+#include "Collision.h"
 
 #define window_h 540
 #define window_w 960
-#define camera_speedF 10
-#define camera_speedM 9
-#define camera_speedB 3
+#define camera_speedF 12
+#define camera_speedM 10
+#define camera_speedB 4
+#define gravity 2
+#define max_fall 16
 
-
-
-void update_loacation(player *player, int *camera_xM, int *camera_xB, int *camera_xF)
+void update_loacation(player *player, plataform *floor, int *camera_xM, int *camera_xB, int *camera_xF, int *lastCollision)
 { 
-	if (player-> control-> left){																																											//Se o botão de movimentação para esquerda do controle do primeiro jogador está ativado...
-			player_move(player, 1, 0, window_w, window_h);
-			player-> turning_left = 1;
-				
-			if (player-> x >= tropicL && player-> x < tropicR)
-			{
-				*camera_xM -= camera_speedM;
-				*camera_xB -= camera_speedB;
-				*camera_xF -= camera_speedF;
-			}																																			//Move o quadrado do primeiro jogador para a esquerda
-			//if (collision_2D(player_1, player_2)) square_move(player_1, -1, 0, X_SCREEN, Y_SCREEN);																												//Se o movimento causou uma colisão entre quadrados, desfaça o mesmo
-		}
-		if (player->control->right)
-		{																																											//Se o botão de movimentação para direita do controle do primeir ojogador está ativado...
-			player_move(player, 1, 1, tropicR, window_h);
-			player-> turning_left = 0;
-			
-			if (player-> x > tropicL && player-> x <= tropicR)
-			{	
-				*camera_xM += camera_speedM;
-				*camera_xB += camera_speedB;
-				*camera_xF += camera_speedF;																																				//Move o quadrado do primeiro jogador para a direta
-			}
-		
-			
-			//if (collision_2D(player_1, player_2)) square_move(player_1, -1, 1, X_SCREEN, Y_SCREEN);																												//Se o movimento causou uma colisão entre quadrados, desfaça o mesmo
-		}
-		if (player->control->up) {																																											//Se o botão de movimentação para cima do controle do primeiro jogador está ativado...
-			player_move(player, 1, 2, window_w, window_h);																																					//Move o quadrado do primeiro jogador para cima
-			//if (collision_2D(player_1, player_2)) square_move(player_1, -1, 2, X_SCREEN, Y_SCREEN);																												//Se o movimento causou uma colisão entre quadrados, desfaça o mesmo
-		}
-		if (player->control->down){																																											//Se o botão de movimentação para baixo do controle do primeiro jogador está ativado...
-			player_move(player, 1, 3, window_w, window_h);																																					//Move o quadrado do primeiro jogador para a baixo
-			//if (collision_2D(player_1, player_2)) square_move(player_1, -1, 3, X_SCREEN, Y_SCREEN);																												//Se o movimento causou uma colisão entre quadrados, desfaça o mesmo
-		}
+	
+	*lastCollision = player-> touching_floor;
+	player-> touching_floor = 0;
+	player-> vY += gravity;
 
+	if (player-> control-> left)
+	{																																											//Se o botão de movimentação para esquerda do controle do primeiro jogador está ativado...
+		player_move(player, 1, 0, window_w, window_h);
+		player-> turning_left = 1;
+				
+		if (player-> x >= tropicL && player-> x < tropicR)
+		{
+			*camera_xM -= camera_speedM;
+			*camera_xB -= camera_speedB;
+			*camera_xF -= camera_speedF;
+		}
+	}	
+	if (player->control->right)
+	{																																											//Se o botão de movimentação para direita do controle do primeir ojogador está ativado...
+		player_move(player, 1, 1, tropicR, window_h);
+		player-> turning_left = 0;
+			
+		if (player-> x > tropicL && player-> x <= tropicR)
+		{	
+			*camera_xM += camera_speedM;
+			*camera_xB += camera_speedB;
+			*camera_xF += camera_speedF;																																				//Move o quadrado do primeiro jogador para a direta
+		}
+	}
+	if (player->control->up && *lastCollision == 1)
+	{																																											//Se o botão de movimentação para cima do controle do primeiro jogador está ativado...
+		player_move(player, 1, 2, window_w, window_h);																																					//Move o quadrado do primeiro jogador para cima
+		player-> touching_floor = 0;
+	}
+	
+	
+	if (player-> vY > max_fall)
+		player-> vY = max_fall;
+		
+	player-> y += player-> vY;
+		
+	if (floorCollision(player, floor) == 1) 
+	{
+		player-> y = floor-> y - (player-> h/2);
+		player-> touching_floor = 1;
+		player->vY = 0;
+	}			
+				
+			/*if (player->control->down){																																											//Se o botão de movimentação para baixo do controle do primeiro jogador está ativado...
+			player_move(player, 1, 3, window_w, window_h);																																					//Move o quadrado do primeiro jogador para a baixo
+			player-> vY = -jump_force;
+			//if (collision_2D(player_1, player_2)) square_move(player_1, -1, 3, X_SCREEN, Y_SCREEN);																												//Se o movimento causou uma colisão entre quadrados, desfaça o mesmo
+		}*/
+		
 		return;
 }
 
@@ -90,15 +109,18 @@ int main(){
 
 	float floor_w = al_get_bitmap_width(plataformTexture);
 	float floor_h = al_get_bitmap_height(plataformTexture);
-	//plataform *floor = create_plataform(floor_w, 700, window_w, window_h);
-
+	
 	int camera_xM, camera_xB, camera_xF = 0;
 	
 	int camera_countF = ((float)window_w/ floor_w) +1;
 	int camera_countM = ((float)window_w/bgMiddleAjustado) +1;
 	int camera_countB = ((float)window_w/bgBackAjustado) +1;
+
+	int lastCollision = 0;
 	
 	player *player = create_player(48, 48, 50, window_h/2, window_w, window_h);
+	plataform *floor = create_plataform(0, (window_h - floor_h - player->h/2), window_w, floor_h);
+
 	
 	ALLEGRO_EVENT event;															//Variável que guarda um evento capturado, sua estrutura é definida em: https://www.allegro.cc/manual/5/ALLEGRO_EVENT
 	al_start_timer(timer);															//Função que inicializa o relógio do programa
@@ -110,8 +132,8 @@ int main(){
 		{														//O evento tipo 30 indica um evento de relógio, ou seja, verificação se a tela deve ser atualizada (conceito de FPS)
 			al_clear_to_color(al_map_rgb(0, 0, 0)); 
 			
-			update_loacation(player, &camera_xM, &camera_xB, &camera_xF);
-			
+			update_loacation(player, floor, &camera_xM, &camera_xB, &camera_xF, &lastCollision);
+
 			BackGroundParallax(camera_xB, camera_countB, bgBack_w, bgBack_h, bgBackAjustado, backgroundBack, window_h);
 			MiddleGroundParallax(camera_xM, camera_countM,bgMiddle_w, bgMiddle_h, bgMiddleAjustado, backgroundMiddle, window_h);
 			FloorParallax (camera_xF, camera_countF, floor_w, floor_h, plataformTexture,window_h);

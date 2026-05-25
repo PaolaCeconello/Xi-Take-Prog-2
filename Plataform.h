@@ -1,15 +1,21 @@
+#ifndef PLATAFORM_H
+#define PLATAFORM_H
+
+
 #include <allegro5/allegro5.h>														//Biblioteca base do Allegro
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
 
 typedef struct
 {
-    float plataform_w;
     int x;
-    int x_max;
-    int y_max;
+    int y;
+    int w;
+    int h;
     
 } plataform;
 
-plataform* create_plataform(float w, int x, int x_max, int y_max);
+plataform* create_plataform(float x, int y, int w, int h);
 void destroy_plataform(plataform);
+
+#endif

@@ -17,6 +17,9 @@ player* create_player (unsigned short h, unsigned short w, unsigned short x, uns
 	new_player-> x = x;																																	//Insere a posição inicial central de X
 	new_player-> y = y;
     new_player-> turning_left = 0;
+    new_player-> touching_floor = 0;
+    new_player-> vY = 0;
+    
     new_player-> control = joystick_create();
   
     return (new_player);
@@ -36,8 +39,11 @@ void player_move(player *element, char steps, unsigned char trajectory, unsigned
     }			//Verifica se a movimentação para a direita é desejada e possível; se sim, efetiva a mesma
 	else if (trajectory == 2)
     { 
-        if ((element->y - steps *PLAYER_STEP) - element-> h/2 >= 0) 
-            element->y = element->y - steps*PLAYER_STEP;
+        if ((element->y - PLAYER_JUMP) - element-> h/2 >= 0) 
+        {
+            element-> vY = -PLAYER_JUMP;
+        }
+
     }				//Verifica se a movimentação para cima é desejada e possível; se sim, efetiva a mesma
 	else if (trajectory == 3)
     { 

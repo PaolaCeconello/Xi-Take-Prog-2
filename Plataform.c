@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include "Plataform.h"
 
-plataform* create_plataform(float w, int x, int x_max, int y_max)
+plataform* create_plataform(float x, int y, int w, int h)
 {
     plataform *new_plataform = malloc(sizeof(plataform));
     
-    new_plataform-> plataform_w = w;
     new_plataform-> x = x;
-    new_plataform-> x_max = x_max;
-    new_plataform-> y_max = y_max;
+    new_plataform-> y = y;
+    new_plataform-> w = h;
+    new_plataform-> h = h;
 
     return(new_plataform);
 }
