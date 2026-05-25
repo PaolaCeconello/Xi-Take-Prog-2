@@ -11,6 +11,8 @@
 
 #define window_h 540
 #define window_w 960
+#define floor_w 67  
+#define floor_h 64 
 #define camera_speedF 12
 #define camera_speedM 10
 #define camera_speedB 4
@@ -89,7 +91,7 @@ int main(){
 	ALLEGRO_DISPLAY* disp = al_create_display(window_w, window_h);
 	ALLEGRO_BITMAP *backgroundBack = al_load_bitmap("Layers/back.png");
 	ALLEGRO_BITMAP *backgroundMiddle = al_load_bitmap("Layers/middle.png");	
-	ALLEGRO_BITMAP *plataformTexture = al_load_bitmap("Layers/tilescontinue.png");
+	ALLEGRO_BITMAP *plataformTexture = al_load_bitmap("Layers/tiles.png");
 	ALLEGRO_BITMAP *playerSprite = al_load_bitmap("playerAnimation/cute_mushroom_idle.png");						//Cria uma janela para o programa, define a largura (x) e a altura (y) da tela em píxeis (320x320, neste caso)
 
 	al_register_event_source(queue, al_get_keyboard_event_source());				//Indica que eventos de teclado serão inseridos na nossa fila de eventos
@@ -107,8 +109,8 @@ int main(){
 	float bgBackAjustado = bgBack_w * escalaBack;
 	float bgMiddleAjustado = bgMiddle_w * escalaMiddle;
 
-	float floor_w = al_get_bitmap_width(plataformTexture);
-	float floor_h = al_get_bitmap_height(plataformTexture);
+	//float floor_w = al_get_bitmap_width(plataformTexture);
+	//float floor_h = al_get_bitmap_height(plataformTexture);
 	
 	int camera_xM, camera_xB, camera_xF = 0;
 	
@@ -117,9 +119,11 @@ int main(){
 	int camera_countB = ((float)window_w/bgBackAjustado) +1;
 
 	int lastCollision = 0;
+	int plataform_count;
 	
 	player *player = create_player(48, 48, 50, window_h/2, window_w, window_h);
 	plataform *floor = create_plataform(0, (window_h - floor_h - player->h/2), window_w, floor_h);
+	plataform **map_vector = create_mapvector(map_vector, floor_w, floor_h, &plataform_count, window_h);
 
 	
 	ALLEGRO_EVENT event;															//Variável que guarda um evento capturado, sua estrutura é definida em: https://www.allegro.cc/manual/5/ALLEGRO_EVENT
@@ -136,8 +140,12 @@ int main(){
 
 			BackGroundParallax(camera_xB, camera_countB, bgBack_w, bgBack_h, bgBackAjustado, backgroundBack, window_h);
 			MiddleGroundParallax(camera_xM, camera_countM,bgMiddle_w, bgMiddle_h, bgMiddleAjustado, backgroundMiddle, window_h);
-			FloorParallax (camera_xF, camera_countF, floor_w, floor_h, plataformTexture,window_h);
+			//FloorParallax (camera_xF, camera_countF, floor_w, floor_h, plataformTexture,window_h, map_vector, 3);
 
+			for(int i = 0; i < plataform_count; i++)
+				al_draw_scaled_bitmap(plataformTexture, 16, 11, 69, 64, map_vector[i]->x-camera_xF, map_vector[i]->y, floor_w*1.5, floor_h*1.5, 0);
+			
+			
 			int ALLEGRO_FLIP_HORIZONTAL = player-> turning_left;
 			al_draw_scaled_bitmap(playerSprite, 0, 0, 48, 48,player-> x-player-> w/2, player-> y-player-> h/2,96,96, ALLEGRO_FLIP_HORIZONTAL);
 			
@@ -164,6 +172,7 @@ int main(){
 	al_destroy_timer(timer);														//Destrutor do relógio
 	al_destroy_event_queue(queue);
 	
+	destroy_plataform(map_vector, plataform_count);
 	destroy_backgorund (plataformTexture, backgroundMiddle, backgroundBack);
 	destroy_player(player);
 												
