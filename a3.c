@@ -11,7 +11,7 @@
 
 #define window_h 540
 #define window_w 960
-#define floor_w 67  
+#define floor_w 69  
 #define floor_h 64 
 #define camera_speedF 12
 #define camera_speedM 10
@@ -19,11 +19,13 @@
 #define gravity 2
 #define max_fall 16
 
-void update_loacation(player *player, plataform *floor, int *camera_xM, int *camera_xB, int *camera_xF, int *lastCollision)
+void update_loacation(player *player, plataform *map_vector[], int plataform_count, int *camera_xM, int *camera_xB, int *camera_xF, int *lastCollision)
 { 
 	
 	*lastCollision = player-> touching_floor;
 	player-> touching_floor = 0;
+	int index;
+	
 	player-> vY += gravity;
 
 	if (player-> control-> left)
@@ -50,23 +52,24 @@ void update_loacation(player *player, plataform *floor, int *camera_xM, int *cam
 			*camera_xF += camera_speedF;																																				//Move o quadrado do primeiro jogador para a direta
 		}
 	}
-	if (player->control->up && *lastCollision == 1)
+	
+	if (player-> control-> up && *lastCollision == 1)
 	{																																											//Se o botão de movimentação para cima do controle do primeiro jogador está ativado...
 		player_move(player, 1, 2, window_w, window_h);																																					//Move o quadrado do primeiro jogador para cima
 		player-> touching_floor = 0;
 	}
-	
 	
 	if (player-> vY > max_fall)
 		player-> vY = max_fall;
 		
 	player-> y += player-> vY;
 		
-	if (floorCollision(player, floor) == 1) 
+	
+	if (collision(player, map_vector, plataform_count, &index) == 1) 
 	{
-		player-> y = floor-> y - (player-> h/2);
+		player-> y = map_vector[index]-> y - map_vector[index]-> w/2 - (player-> h/2);
 		player-> touching_floor = 1;
-		player->vY = 0;
+		player-> vY = 0;
 	}			
 				
 			/*if (player->control->down){																																											//Se o botão de movimentação para baixo do controle do primeiro jogador está ativado...
@@ -74,8 +77,7 @@ void update_loacation(player *player, plataform *floor, int *camera_xM, int *cam
 			player-> vY = -jump_force;
 			//if (collision_2D(player_1, player_2)) square_move(player_1, -1, 3, X_SCREEN, Y_SCREEN);																												//Se o movimento causou uma colisão entre quadrados, desfaça o mesmo
 		}*/
-		
-		return;
+	return;
 }
 
 int main(){
@@ -136,14 +138,14 @@ int main(){
 		{														//O evento tipo 30 indica um evento de relógio, ou seja, verificação se a tela deve ser atualizada (conceito de FPS)
 			al_clear_to_color(al_map_rgb(0, 0, 0)); 
 			
-			update_loacation(player, floor, &camera_xM, &camera_xB, &camera_xF, &lastCollision);
+			update_loacation(player,map_vector,plataform_count, &camera_xM, &camera_xB, &camera_xF, &lastCollision);
 
 			BackGroundParallax(camera_xB, camera_countB, bgBack_w, bgBack_h, bgBackAjustado, backgroundBack, window_h);
 			MiddleGroundParallax(camera_xM, camera_countM,bgMiddle_w, bgMiddle_h, bgMiddleAjustado, backgroundMiddle, window_h);
 			//FloorParallax (camera_xF, camera_countF, floor_w, floor_h, plataformTexture,window_h, map_vector, 3);
 
 			for(int i = 0; i < plataform_count; i++)
-				al_draw_scaled_bitmap(plataformTexture, 16, 11, 69, 64, map_vector[i]->x-camera_xF, map_vector[i]->y, floor_w*1.5, floor_h*1.5, 0);
+				al_draw_scaled_bitmap(plataformTexture, 16, 11, 64, 69, map_vector[i]->x-camera_xF, map_vector[i]->y, floor_w*1.5, floor_h*1.5, 0);
 			
 			
 			int ALLEGRO_FLIP_HORIZONTAL = player-> turning_left;

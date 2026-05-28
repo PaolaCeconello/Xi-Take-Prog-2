@@ -39,7 +39,7 @@ void player_move(player *element, char steps, unsigned char trajectory, unsigned
     }			//Verifica se a movimentação para a direita é desejada e possível; se sim, efetiva a mesma
 	else if (trajectory == 2)
     { 
-        if ((element->y - PLAYER_JUMP) - element-> h/2 >= 0) 
+        if ((element-> y - PLAYER_JUMP) - element-> h/2 >= 0) 
         {
             element-> vY = -PLAYER_JUMP;
         }

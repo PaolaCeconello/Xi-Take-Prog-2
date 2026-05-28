@@ -8,6 +8,6 @@
 #include "Player.h"
 #include "Plataform.h"
 
-int floorCollision (player* player, plataform* floor);
+int collision (player* player, plataform* map_vector[], int plataform_count, int *index);
 
 #endif

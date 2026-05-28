@@ -7,7 +7,7 @@
 #include "Joystick.h"
 
 #define PLAYER_STEP 12
-#define PLAYER_JUMP 24
+#define PLAYER_JUMP 28
 #define tropicR window_w/2
 #define tropicL 960/10																															//Tamanho, em pixels, de um passo do quadrado
 
