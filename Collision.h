@@ -8,6 +8,9 @@
 #include "Player.h"
 #include "Plataform.h"
 
-int collision (player* player, plataform* map_vector[], int plataform_count, int *index);
+int collision (player* player, plataform* map_vector[], int plataform_count, int *index, int camera_xF, int *axis);
 
+int collision_x (player* player, plataform* map_vector[], int plataform_count, int *index, int camera_xF);
+
+int collision_y(player* player, plataform* map_vector[], int plataform_count, int *index, int camera_xF);
 #endif

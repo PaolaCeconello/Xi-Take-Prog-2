@@ -3,15 +3,18 @@
 #include <stdlib.h>
 #include <allegro5/allegro5.h>														
 #include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
 #include "Player.h"
 #include "Plataform.h"
 #include "BackGroundParallax.h"
 #include "Collision.h"
+#include "SoftReset.h"
 
 #define window_h 540
 #define window_w 960
-#define floor_w 69  
+#define floor_w 64  
 #define floor_h 64 
 #define camera_speedF 12
 #define camera_speedM 10
@@ -21,13 +24,10 @@
 
 void update_loacation(player *player, plataform *map_vector[], int plataform_count, int *camera_xM, int *camera_xB, int *camera_xF, int *lastCollision)
 { 
-	
 	*lastCollision = player-> touching_floor;
 	player-> touching_floor = 0;
 	int index;
 	
-	player-> vY += gravity;
-
 	if (player-> control-> left)
 	{																																											//Se o botão de movimentação para esquerda do controle do primeiro jogador está ativado...
 		player_move(player, 1, 0, window_w, window_h);
@@ -39,7 +39,12 @@ void update_loacation(player *player, plataform *map_vector[], int plataform_cou
 			*camera_xB -= camera_speedB;
 			*camera_xF -= camera_speedF;
 		}
+	
+		if (collision_x(player, map_vector, plataform_count, &index, *camera_xF) == 1)
+			player-> x = map_vector[index]-> x - 40 - *camera_xF + map_vector[index]-> w + player-> w/2;
+			
 	}	
+	
 	if (player->control->right)
 	{																																											//Se o botão de movimentação para direita do controle do primeir ojogador está ativado...
 		player_move(player, 1, 1, tropicR, window_h);
@@ -51,6 +56,9 @@ void update_loacation(player *player, plataform *map_vector[], int plataform_cou
 			*camera_xB += camera_speedB;
 			*camera_xF += camera_speedF;																																				//Move o quadrado do primeiro jogador para a direta
 		}
+	
+		if (collision_x(player, map_vector, plataform_count, &index, *camera_xF) == 1)
+			player-> x = map_vector[index]-> x - 40 - *camera_xF - player-> w/2;
 	}
 	
 	if (player-> control-> up && *lastCollision == 1)
@@ -59,16 +67,23 @@ void update_loacation(player *player, plataform *map_vector[], int plataform_cou
 		player-> touching_floor = 0;
 	}
 	
+	player-> vY += gravity;
+
 	if (player-> vY > max_fall)
 		player-> vY = max_fall;
 		
 	player-> y += player-> vY;
 		
-	
-	if (collision(player, map_vector, plataform_count, &index) == 1) 
+	if (collision_y(player, map_vector, plataform_count, &index, *camera_xF) == 1) 
 	{
-		player-> y = map_vector[index]-> y - map_vector[index]-> w/2 - (player-> h/2);
-		player-> touching_floor = 1;
+		if (player-> vY >= 0)
+			{
+				player-> y = map_vector[index]-> y - player-> h/2 - 20;
+				player-> touching_floor = 1;
+			}
+			else  
+				player-> y = map_vector[index]-> y + map_vector[index]-> h + player-> h/2;
+		
 		player-> vY = 0;
 	}			
 				
@@ -80,22 +95,44 @@ void update_loacation(player *player, plataform *map_vector[], int plataform_cou
 	return;
 }
 
+void update_game_state(int *gameState, ALLEGRO_FONT* font)
+{
+   switch (*gameState)
+    {
+    case 67:
+        break;
+    
+    case 1:
+        al_draw_text(font, al_map_rgb(255, 255, 255),10, 10,ALLEGRO_ALIGN_LEFT, "VOCE MORREU");  
+        al_draw_text(font, al_map_rgb(255, 255, 255),50, 50,ALLEGRO_ALIGN_LEFT, "pressione enter para jogar de novo");  
+		break;
+	
+	
+	default:
+        al_draw_text(font, al_map_rgb(255, 255, 255),10, 10,ALLEGRO_ALIGN_LEFT, "Pressione ENTER para jogar");  
+       	break;
+    }
+}
+
 int main(){
 	
 	al_init();																		//Faz a preparação de requisitos da biblioteca Allegro
 	al_install_keyboard();
-	al_init_image_addon();															//Habilita a entrada via teclado (eventos de teclado), no programa
+	al_init_image_addon();
+	al_init_primitives_addon(); 
+	al_init_font_addon(); // Inicializa o sistema de fontes base
+   	al_init_ttf_addon();  // Inicializa o suporte para fontes TrueType (.ttf)															//Habilita a entrada via teclado (eventos de teclado), no programa
 
 	ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);								//Cria o relógio do jogo; isso indica quantas atualizações serão realizadas por segundo (30, neste caso)
 	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();							//Cria a fila de eventos; todos os eventos (programação orientada a eventos) 
-	ALLEGRO_FONT* font = al_create_builtin_font();									//Carrega uma fonte padrão para escrever na tela (é bitmap, mas também suporta adicionar fontes ttf)
+	ALLEGRO_FONT* font = al_load_font("fontes/Cavalhatriz.ttf", 16, 0);									//Carrega uma fonte padrão para escrever na tela (é bitmap, mas também suporta adicionar fontes ttf)
 	
 	ALLEGRO_DISPLAY* disp = al_create_display(window_w, window_h);
 	ALLEGRO_BITMAP *backgroundBack = al_load_bitmap("Layers/back.png");
 	ALLEGRO_BITMAP *backgroundMiddle = al_load_bitmap("Layers/middle.png");	
 	ALLEGRO_BITMAP *plataformTexture = al_load_bitmap("Layers/tiles.png");
-	ALLEGRO_BITMAP *playerSprite = al_load_bitmap("playerAnimation/cute_mushroom_idle.png");						//Cria uma janela para o programa, define a largura (x) e a altura (y) da tela em píxeis (320x320, neste caso)
-
+	ALLEGRO_BITMAP *playerSprite = al_load_bitmap("playerAnimation/cute_mushroom_idle.png");
+	
 	al_register_event_source(queue, al_get_keyboard_event_source());				//Indica que eventos de teclado serão inseridos na nossa fila de eventos
 	al_register_event_source(queue, al_get_display_event_source(disp));				//Indica que eventos de tela serão inseridos na nossa fila de eventos
 	al_register_event_source(queue, al_get_timer_event_source(timer));				//Indica que eventos de relógio serão inseridos na nossa fila de eventos
@@ -123,6 +160,8 @@ int main(){
 	int lastCollision = 0;
 	int plataform_count;
 	
+	int gameState;
+	
 	player *player = create_player(48, 48, 50, window_h/2, window_w, window_h);
 	plataform *floor = create_plataform(0, (window_h - floor_h - player->h/2), window_w, floor_h);
 	plataform **map_vector = create_mapvector(map_vector, floor_w, floor_h, &plataform_count, window_h);
@@ -138,19 +177,29 @@ int main(){
 		{														//O evento tipo 30 indica um evento de relógio, ou seja, verificação se a tela deve ser atualizada (conceito de FPS)
 			al_clear_to_color(al_map_rgb(0, 0, 0)); 
 			
-			update_loacation(player,map_vector,plataform_count, &camera_xM, &camera_xB, &camera_xF, &lastCollision);
+			if (gameState == 67)
+			{
+				update_loacation(player,map_vector,plataform_count, &camera_xM, &camera_xB, &camera_xF, &lastCollision);
 
-			BackGroundParallax(camera_xB, camera_countB, bgBack_w, bgBack_h, bgBackAjustado, backgroundBack, window_h);
-			MiddleGroundParallax(camera_xM, camera_countM,bgMiddle_w, bgMiddle_h, bgMiddleAjustado, backgroundMiddle, window_h);
-			//FloorParallax (camera_xF, camera_countF, floor_w, floor_h, plataformTexture,window_h, map_vector, 3);
+				BackGroundParallax(camera_xB, camera_countB, bgBack_w, bgBack_h, bgBackAjustado, backgroundBack, window_h);
+				MiddleGroundParallax(camera_xM, camera_countM,bgMiddle_w, bgMiddle_h, bgMiddleAjustado, backgroundMiddle, window_h);
+				//FloorParallax (camera_xF, camera_countF, floor_w, floor_h, plataformTexture,window_h, map_vector, 3);
 
-			for(int i = 0; i < plataform_count; i++)
-				al_draw_scaled_bitmap(plataformTexture, 16, 11, 64, 69, map_vector[i]->x-camera_xF, map_vector[i]->y, floor_w*1.5, floor_h*1.5, 0);
+				for(int i = 0; i < plataform_count; i++)
+					al_draw_scaled_bitmap(plataformTexture, 16, 11, 64, 64, map_vector[i]->x-camera_xF, map_vector[i]->y, floor_w*1.5, floor_h*1.5, 0);
 			
+   				int ALLEGRO_FLIP_HORIZONTAL = player-> turning_left;
+				al_draw_scaled_bitmap(playerSprite, 0, 0, 48, 48,player-> x-player-> w/2, player-> y-player-> h/2,96,96, ALLEGRO_FLIP_HORIZONTAL);
 			
-			int ALLEGRO_FLIP_HORIZONTAL = player-> turning_left;
-			al_draw_scaled_bitmap(playerSprite, 0, 0, 48, 48,player-> x-player-> w/2, player-> y-player-> h/2,96,96, ALLEGRO_FLIP_HORIZONTAL);
+			}
 			
+			if (player-> y - player-> h/2 > window_h)
+			{	
+				gameState = 1;
+				soft_reset(player, &camera_xM, &camera_xB,&camera_xF, window_h);
+			}
+			
+			update_game_state(&gameState, font);
 			al_flip_display();														//Insere as modificações realizadas nos buffers de tela
 		
 		}	
@@ -160,7 +209,8 @@ int main(){
 			if (event.keyboard.keycode == 1) joystick_left(player-> control);																															//Indica o evento correspondente no controle do primeiro jogador (botão de movimentação à esquerda)
 			else if (event.keyboard.keycode == 4) joystick_right(player-> control);																													//Indica o evento correspondente no controle do primeiro jogador (botão de movimentação à direita)
 			else if (event.keyboard.keycode == 23) joystick_up(player-> control);																														//Indica o evento correspondente no controle do primeiro jogador (botão de movimentação para cima)
-			else if (event.keyboard.keycode == 19) joystick_down(player-> control);																													//Indica o evento correspondente no controle do primeiro jogador (botão de movimentação para baixo)
+			else if (event.keyboard.keycode == 19) joystick_down(player-> control);
+			else if (event.keyboard.keycode == 67) gameState = 67;																													//Indica o evento correspondente no controle do primeiro jogador (botão de movimentação para baixo)
 		}
 			
 		else if (event.type == 42) break;											//Evento de clique no "X" de fechamento da tela. Encerra o programa graciosamente.
@@ -169,10 +219,12 @@ int main(){
 		
 	}
 
+	
 	al_destroy_font(font);															//Destrutor da fonte padrão
 	al_destroy_display(disp);														//Destrutor da tela
 	al_destroy_timer(timer);														//Destrutor do relógio
 	al_destroy_event_queue(queue);
+	al_shutdown_primitives_addon();
 	
 	destroy_plataform(map_vector, plataform_count);
 	destroy_backgorund (plataformTexture, backgroundMiddle, backgroundBack);
