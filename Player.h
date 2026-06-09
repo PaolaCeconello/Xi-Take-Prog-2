@@ -20,6 +20,14 @@ typedef struct
     int turning_left;
     int touching_floor;
     int vY;
+    int life;
+    int life_cooldown;
+    int is_invinceble;
+    int status;
+    float current_frame;
+    int max_frames;
+    int frame_count;
+    int frame_delay;
     
     joystick *control;
 } player;																																			//Definição do nome da estrutura

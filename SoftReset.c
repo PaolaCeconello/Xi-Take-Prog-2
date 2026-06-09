@@ -2,15 +2,13 @@
 
 void soft_reset(player* player, int *camera_xM, int *camera_xB, int *camera_xF, int window_h)
 {
-    fprintf(stderr, "PASSOU 1");
-    
     player-> x = 50;																																	//Insere a posição inicial central de X
     player-> y = window_h/2;
     player-> turning_left = 0;
     player-> touching_floor = 0;
     player-> vY = 0; 
+    player-> life = 3;
 
-     fprintf(stderr, "PASSOU 2");
     *camera_xB = 0;
     *camera_xF = 0;
     *camera_xM = 0;

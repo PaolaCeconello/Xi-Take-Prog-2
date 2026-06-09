@@ -19,6 +19,13 @@ player* create_player (unsigned short h, unsigned short w, unsigned short x, uns
     new_player-> turning_left = 0;
     new_player-> touching_floor = 0;
     new_player-> vY = 0;
+    new_player-> life = 3;
+    new_player-> life_cooldown = 60;
+    new_player-> is_invinceble = 0;
+    new_player-> status = 0;
+    new_player-> current_frame = 0.f;
+    new_player-> frame_delay = 5;
+    new_player-> frame_count = 0;
     
     new_player-> control = joystick_create();
   
@@ -47,8 +54,7 @@ void player_move(player *element, char steps, unsigned char trajectory, unsigned
     }				//Verifica se a movimentação para cima é desejada e possível; se sim, efetiva a mesma
 	else if (trajectory == 3)
     { 
-        if ((element->y + steps *PLAYER_STEP) + element-> h/2 <= max_y) 
-            element->y = element->y + steps*PLAYER_STEP;
+      
     }			//Verifica se a movimentação para baixo é desejada e possível; se sim, efetiva a mesma
 }
 

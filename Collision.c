@@ -1,6 +1,5 @@
 #include "Collision.h"
 
-
 int collision (player* player, plataform* map_vector[], int plataform_count, int *index, int camera_xF, int *axis)
 {
     float min_overlap = 1e9;
@@ -115,7 +114,8 @@ int collision_y(player* player, plataform* map_vector[], int plataform_count, in
         if((player-> y + player-> h/2) > (map_vector[i]-> y - 20) 
         && (player-> y - player-> h/2) < (map_vector[i]-> y + map_vector[i]-> h)
         && (player-> x + player-> w/2) > (map_vector[i]-> x - 40 - camera_xF)
-        && (player-> x - player-> w/2) < (map_vector[i]-> x - 40 - camera_xF + map_vector[i]-> w))
+        && (player-> x - player-> w/2) < (map_vector[i]-> x - 40 - camera_xF + map_vector[i]-> w)
+        && (player-> y - player-> h/2) > 0)
         {    
           
            if (playerBottom < plataformBottom)
