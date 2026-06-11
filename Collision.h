@@ -15,7 +15,6 @@ int collision_x (player* player, plataform* map_vector[], int plataform_count, i
 
 int collision_y(player* player, plataform* map_vector[], int plataform_count, int *index, int camera_xF);
 
-int collision_slimeX(trap *trap, plataform *map_vector[], int plataform_count, int camera_xF);
+int collision_top (plataform *map_vector[], player *player, int plataform_count, int camera_xF);
 
-int collision_slimeY(trap *trap, plataform *map_vector[], int plataform_count, int camera_xF);
 #endif

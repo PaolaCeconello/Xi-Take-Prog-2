@@ -9,11 +9,11 @@ trap** create_trapvector (trap *trap_vector[], int *trap_count, ALLEGRO_BITMAP *
         
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,1,1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,2,0,0,0,0},
+        {0,0,0,0,0,0,1,0,0,0,0,2,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,5,5,5,5}
     };
 
@@ -48,7 +48,7 @@ trap** create_trapvector (trap *trap_vector[], int *trap_count, ALLEGRO_BITMAP *
                 if (i == 6)
                     trap_vector[index]-> y = window_h - floor_h -(al_get_bitmap_height(spikesSprite));
                 else
-                    trap_vector[index]-> y = i * al_get_bitmap_height(spikesSprite) - 5; 
+                    trap_vector[index]-> y = i * al_get_bitmap_height(spikesSprite) + 153; 
 
                 index++;
             }
@@ -134,68 +134,6 @@ trap** create_trapvector (trap *trap_vector[], int *trap_count, ALLEGRO_BITMAP *
 
     return(trap_vector);
 }
-void check_traps (trap* trap_vector[], int trap_count, player *player, int camera_xF)
-{
-    float min_overlap = 1e9;
-    int found = 0;
-    int index = 0;
-        
-    for(int i = 0; i < trap_count; i++)
-    {  
-        float playerTop = player-> y - player-> h/2;
-        float playerBottom = player-> y + player-> h/2;
-        float playerRight = player-> x + player-> w/2;
-        float playerLeft = player-> x - player-> w/2;
-        float trapRight = trap_vector[i]-> x - camera_xF + trap_vector[i]-> w;
-        float trapBottom = trap_vector[i]-> y + trap_vector[i]-> h; 
-
-        float overlap_x;
-        float overlap_y;
-        float overlap;
-      
-        if((player-> y + player-> h/2) > (trap_vector[i]-> y) 
-        && (player-> y - player-> h/2) < (trap_vector[i]-> y + trap_vector[i]-> h)
-        && (player-> x + player-> w/2) > (trap_vector[i]-> x - camera_xF)
-        && (player-> x - player-> w/2) < (trap_vector[i]-> x - camera_xF + trap_vector[i]-> w))
-        {    
-            if (playerRight < trapRight)
-                overlap_x = playerRight - (trap_vector[i]-> x - camera_xF);
-            else 
-                overlap_x = trapRight + playerLeft;
-
-            if (playerBottom < trapBottom)
-                overlap_y = playerBottom - trap_vector[i]-> y;
-            else 
-                overlap_y = trapBottom - playerTop;
-
-            if (overlap_x < overlap_y)
-                overlap = overlap_x;
-            else
-                overlap = overlap_y;
-                
-            if (overlap < min_overlap)
-            { 
-                min_overlap = overlap;
-                index = i;
-                found = 1;
-            }
-        }
-    }
-
-    if (found == 1)
-    {
-        switch (trap_vector[index]-> type)
-        {
-        case 1:
-            player-> life--;
-            player-> vY = -7;
-            break;
-    
-        default:
-            break;
-        }
-    }
-}
 
 int check_trapsX(trap* trap_vector[], int trap_count, player *player, int camera_xF, int *index)
 {
@@ -212,14 +150,14 @@ int check_trapsX(trap* trap_vector[], int trap_count, player *player, int camera
  
         if((player-> y + player-> h/2) > (trap_vector[i]-> y - 20) 
         && (player-> y - player-> h/2) < (trap_vector[i]-> y + trap_vector[i]-> h)
-        && (player-> x + player-> w/2) > (trap_vector[i]-> x - 40 -camera_xF)
+        && (player-> x + player-> w/2) > (trap_vector[i]-> x - 40 - camera_xF)
         && (player-> x - player-> w/2) < (trap_vector[i]-> x - 40 - camera_xF + trap_vector[i]-> w))
         {    
           
             if (playerRight < plataformRight)
                 overlap_x = playerRight -(trap_vector[i]-> x - camera_xF);
             else 
-                overlap_x = plataformRight + playerLeft;
+                overlap_x = plataformRight - playerLeft;
 
             if (overlap_x < min_overlap)
             { 
@@ -265,9 +203,8 @@ int check_trapsY(player* player, trap* trap_vector[], int trap_count, int *index
                 found = 1;
             }
         }
-    }    
-        //if((player-> y + player-> h/2) > map_vector[i]-> y + map_vector[i]-> h/2)
-        //return (1);
+    }   
+    
     return(found);
 }
 
@@ -290,8 +227,7 @@ void trap_efect (trap* trap, player* player)
             player-> status = 4;
             player-> touching_floor = 1;
             player-> vY = 0;
-            //player-> x = (trap-> x - 350);
-
+            
             player-> y = player-> y - PLAYER_STEP;
         }
        
@@ -327,32 +263,10 @@ void trap_efect (trap* trap, player* player)
     
             if (trap-> cooldown == 0)
                 trap-> status = 1;
-
-            /*if(trap-> status == 1)
-            {
-                if (trap-> y >= 620)
-                {    
-                    trap-> status = 2;
-                    trap-> cooldown = 10;
-                }
-            }
-            
-            if (trap-> status == 2)
-            {
-                trap-> cooldown--;
-                if (trap->cooldown == 0)
-                {    
-                    trap-> status == 0;
-                    trap-> y = trap-> original_y;
-                    trap-> cooldown = 4;
-                }
-            }*/
-    }
+        }
     
-    break;
+        break;
 
-        
-        
         default:
             break;
         }
@@ -408,13 +322,9 @@ void print_trap (trap *trap, int camera_xF, ALLEGRO_BITMAP *spikesSprite, ALLEGR
                 }
         }
     
-    
     break;
-
-    
     }
 }
-
 
 void destroy_traps (trap *trap_vector[], int trap_count)
 {

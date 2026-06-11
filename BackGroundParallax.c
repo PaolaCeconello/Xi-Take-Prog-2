@@ -19,9 +19,6 @@ void FloorParallax (int camera_x, int camera_count, float floor_w, float floor_h
 			int x = -start_x + (i * floor_w);
 				
 			al_draw_scaled_bitmap(plataformTexture, 0, 0, floor_w, floor_h, x, (window_h - floor_h), floor_w, floor_h, 0);
-			
-			
-			
 			i++;
 		}
     return;

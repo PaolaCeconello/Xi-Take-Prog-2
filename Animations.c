@@ -165,8 +165,5 @@ void slime_animation (trap *trap, plataform *map_vector[], int plataform_count, 
         trap->current_frame = 0;
 }
 
-void drop_plataform_animation (trap *trap, player *player)
-{
-    trap-> y += 15;
-}
+
     
