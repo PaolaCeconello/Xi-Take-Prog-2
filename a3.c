@@ -223,7 +223,7 @@ void update_game_state(int *gameState, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* gam
         al_draw_scaled_bitmap(gameover, 0, 0, 480, 320, 0,0 ,window_w,window_h, 0);  
 		break;
 	
-	default:
+	case 59:
         al_draw_scaled_bitmap(menu, 0, 0, 960, 540, 0,0 ,window_w,window_h, 0);  
        	break;
     }
@@ -248,6 +248,7 @@ int main(){
 	ALLEGRO_BITMAP *plataformTexture = al_load_bitmap("Layers/tiles.png");
 	ALLEGRO_BITMAP *playerSprite = al_load_bitmap("playerAnimation/pixil-frame-0(14).png");
 	ALLEGRO_BITMAP *lifeSprite = al_load_bitmap("hearts/heart_spritesheet_32x32.png");
+	ALLEGRO_BITMAP *orange = al_load_bitmap ("hearts/fruit_orange_slice.png");
 
 	ALLEGRO_BITMAP *spikesSprite = al_load_bitmap("traps/16-bit-spike-Sheet.png");
 	ALLEGRO_BITMAP *ladderSprite = al_load_bitmap("traps/pixil-frame-0(13).png");
@@ -287,11 +288,12 @@ int main(){
 	int lastCollision = 0;
 	int plataform_count;
 	int trap_count;
+	int plus_life = 0;
 
 	int source_x;
 	int source_y;
 	
-	int gameState;
+	int gameState = 59;
 	
 	player *player = create_player(48, 48, 50, window_h/2, window_w, window_h);
 	plataform *floor = create_plataform(0, (window_h - floor_h - player->h/2), window_w, floor_h);
@@ -333,6 +335,18 @@ int main(){
 				for (int i = 0; i< trap_count; i++)
 					print_trap(trap_vector[i], camera_xF, spikesSprite, ladderSprite, fireSprite, slimeSprite,dropPlataformSprite, map_vector, plataform_count,player);
 				
+				if (plus_life == 0)
+					al_draw_scaled_bitmap(orange, 0, 0, 16, 16, 3333 - camera_xF, 420, 16*2, 16*2,0);
+				
+				if ((player-> y + player-> h/2) > (420) 
+        		&& (player-> y - player-> h/2) < (420 + 32)
+        		&& (player-> x + player-> w/2) > (3333 - camera_xF)
+        		&& (player-> x - player-> w/2) < (3333- camera_xF + 32) && plus_life == 0)
+				{
+					plus_life = 1;
+					player-> life += 1;
+				}
+				
 				for(int i = 1; i <= player-> life; i++)
 					al_draw_scaled_bitmap(lifeSprite, 0, 0, 32, 32, 35*i ,35,32,32,0);
 				
@@ -348,7 +362,7 @@ int main(){
 			if (player-> y - player-> h/2 > window_h || player-> life <= 0)
 			{	
 				gameState = 1;
-				soft_reset(player, &camera_xM, &camera_xB,&camera_xF, window_h, trap_vector, trap_count);
+				soft_reset(player, &camera_xM, &camera_xB,&camera_xF, window_h, trap_vector, trap_count, &plus_life);
 			}
 			
 			update_game_state(&gameState, menu, gameover);
@@ -362,7 +376,8 @@ int main(){
 			else if (event.keyboard.keycode == 4) joystick_right(player-> control);																													//Indica o evento correspondente no controle do primeiro jogador (botão de movimentação à direita)
 			else if (event.keyboard.keycode == 23) joystick_up(player-> control);																														//Indica o evento correspondente no controle do primeiro jogador (botão de movimentação para cima)
 			else if (event.keyboard.keycode == 19) joystick_down(player-> control);
-			else if (event.keyboard.keycode == 67) gameState = 67;																													//Indica o evento correspondente no controle do primeiro jogador (botão de movimentação para baixo)
+			else if (event.keyboard.keycode == 67) gameState = 67;
+			else if (event.keyboard.keycode == 59) gameState = 59;																													//Indica o evento correspondente no controle do primeiro jogador (botão de movimentação para baixo)
 		}
 			
 		else if (event.type == 42) break;											//Evento de clique no "X" de fechamento da tela. Encerra o programa graciosamente.

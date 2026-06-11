@@ -1,6 +1,6 @@
 #include "SoftReset.h"
 
-void soft_reset(player* player, int *camera_xM, int *camera_xB, int *camera_xF, int window_h, trap *trap_vector[], int trap_count)
+void soft_reset(player* player, int *camera_xM, int *camera_xB, int *camera_xF, int window_h, trap *trap_vector[], int trap_count, int *plus_life)
 {
     player-> x = 50;																																	//Insere a posição inicial central de X
     player-> y = window_h/2;
@@ -14,6 +14,8 @@ void soft_reset(player* player, int *camera_xM, int *camera_xB, int *camera_xF, 
     *camera_xB = 0;
     *camera_xF = 0;
     *camera_xM = 0;
+
+    *plus_life = 0;
 
     for (int i = 0; i < trap_count; i++)
         if (trap_vector[i]-> type == 5)
