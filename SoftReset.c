@@ -1,6 +1,6 @@
 #include "SoftReset.h"
 
-void soft_reset(player* player, int *camera_xM, int *camera_xB, int *camera_xF, int window_h)
+void soft_reset(player* player, int *camera_xM, int *camera_xB, int *camera_xF, int window_h, trap *trap_vector[], int trap_count)
 {
     player-> x = 50;																																	//Insere a posição inicial central de X
     player-> y = window_h/2;
@@ -8,65 +8,37 @@ void soft_reset(player* player, int *camera_xM, int *camera_xB, int *camera_xF, 
     player-> touching_floor = 0;
     player-> vY = 0; 
     player-> life = 3;
+    player-> status = 0;
+    player-> is_invinceble = 0;
 
     *camera_xB = 0;
     *camera_xF = 0;
     *camera_xM = 0;
 
-    /*int index = 0;
-    
-    int map_matrix[8][28]={
-        
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,0,0},
-        {0,0,0,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0},
-        {0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,2,2},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,1,1,1,1,1,1,1,0,0,1}
-    };
-    
-    /*for (int i = 0; i < 8; i++)
-        for(int j = 0; j < 28; j++)
+    for (int i = 0; i < trap_count; i++)
+        if (trap_vector[i]-> type == 5)
         {
-            if (map_matrix[i][j]== 1 || map_matrix[i][j] == 2)
-                index++;
-        }    
-            
-    for (int n = 0; n < index; n++)
+            trap_vector[i]-> cooldown = 5;
+            trap_vector[i]-> status = 0;
+            trap_vector[i]-> y = trap_vector[i]-> original_y;
+        }
+    return;
+}
+
+void reset_drop_plataforms (trap* trap_vector[], int trap_count, player *player)
+{
+    for (int i = 0; i < trap_count; i++)
     {
-        map_vector[n] = 0;
-    }
-    
-    index = 0;
-    
-    fprintf(stderr, "PASSOU 3"); 
-    for (int i = 0; i < 8; i++)
-        for(int j = 0; j < 28; j++)
+        if (trap_vector[i]-> type == 5 && trap_vector[i]-> status == 2)
         {
-             fprintf(stderr, "PASSOU 3.1"); 
-            if (map_matrix[i][j] == 1)
-            {
-                map_vector[index]-> w = floor_w * 1.5;
-                map_vector[index]-> h = floor_h * 1.5;
-                map_vector[index]-> x = j * floor_w *1.5;
-                map_vector[index]-> y = window_h - (floor_h);
-                
-                index++;
-            }
-        
-             fprintf(stderr, "PASSOU 3.2");  
-            if (map_matrix[i][j] == 2)
-            {
-                map_vector[index]-> w = floor_w * 1.5;
-                map_vector[index]-> h = floor_h * 1.5;
-                map_vector[index]-> x = j * floor_w * 1.5;
-                map_vector[index]-> y = i * floor_h - 5;
-                
-                index++;
+            trap_vector[i]-> cooldown--;
+            if (trap_vector[i]->cooldown == 0)
+            {    
+                trap_vector[i]-> status = 0;
+                trap_vector[i]-> y = trap_vector[i]-> original_y;
+                trap_vector[i]-> cooldown = 5;
+                player-> touching_floor = 1;
             }
         }
-     fprintf(stderr, "PASSOU 4");*/
-    return;
+    }
 }

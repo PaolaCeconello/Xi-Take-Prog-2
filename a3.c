@@ -48,16 +48,19 @@ void update_location(player *player, plataform *map_vector[], int plataform_coun
 			*camera_xF -= camera_speedF;
 		}
 	
+		
 		if (collision_x(player, map_vector, plataform_count, &indexCollision, *camera_xF) == 1)
 			player-> x = map_vector[indexCollision]-> x - 40 - *camera_xF + map_vector[indexCollision]-> w + player-> w/2;
 
 		if (check_trapsX(trap_vector,trap_count,player,*camera_xF, &indexTraps) == 1  && player-> is_invinceble == 0)
-			trap_efect(trap_vector[indexTraps]-> type, player);	
+			trap_efect(trap_vector[indexTraps], player);
+			
 			
 		else if (player-> is_invinceble == 1)
 				player-> life_cooldown--;
 		if (player-> life_cooldown == 0)
 		{	
+			player-> status = 0;
 			player-> is_invinceble = 0;
 			player-> life_cooldown = 60;
 		}
@@ -76,16 +79,23 @@ void update_location(player *player, plataform *map_vector[], int plataform_coun
 			*camera_xF += camera_speedF;																																				//Move o quadrado do primeiro jogador para a direta
 		}
 	
+		
 		if (collision_x(player, map_vector, plataform_count, &indexCollision, *camera_xF) == 1)
 			player-> x = map_vector[indexCollision]-> x - 40 - *camera_xF - player-> w/2;
 
 		if (check_trapsX(trap_vector,trap_count,player,*camera_xF, &indexTraps) == 1 && player-> is_invinceble == 0)
-			trap_efect(trap_vector[indexTraps]-> type, player);	
+			trap_efect(trap_vector[indexTraps], player);
+		
+				
 			
 		else if (player-> is_invinceble == 1)
-				player-> life_cooldown--;
+		{		
+			player-> life_cooldown--;
+			player-> status = 3;
+		}
 		if (player-> life_cooldown == 0)
 		{	
+			player-> status = 0;
 			player-> is_invinceble = 0;
 			player-> life_cooldown = 60;
 		}
@@ -99,16 +109,23 @@ void update_location(player *player, plataform *map_vector[], int plataform_coun
 		player-> status = 2;
 		player-> h = 28;
 		
+		
 		if (collision_x(player, map_vector, plataform_count, &indexCollision, *camera_xF) == 1)
 			player-> x = map_vector[indexCollision]-> x - 40 - *camera_xF - player-> w/2;
 
 		if (check_trapsX(trap_vector,trap_count,player,*camera_xF, &indexTraps) == 1 && player-> is_invinceble == 0)
-			trap_efect(trap_vector[indexTraps]-> type, player);	
+			trap_efect(trap_vector[indexTraps], player);	
+		
 			
 		else if (player-> is_invinceble == 1)
-				player-> life_cooldown--;
+		{		
+			player-> life_cooldown--;
+			player-> status = 3;
+		}
+		
 		if (player-> life_cooldown == 0)
 		{	
+			player-> status = 0;
 			player-> is_invinceble = 0;
 			player-> life_cooldown = 60;
 		}
@@ -119,8 +136,7 @@ void update_location(player *player, plataform *map_vector[], int plataform_coun
 		player->h = 48;
 	}
     																																				//Move o quadrado do primeiro jogador para a baixo
-		
-	if (player-> control-> up && *lastCollision == 1)
+	if (player-> control-> up && *lastCollision == 1 && player-> status != 4)
 	{																																											//Se o botão de movimentação para cima do controle do primeiro jogador está ativado...
 		player_move(player, 1, 2, window_w, window_h);																																					//Move o quadrado do primeiro jogador para cima
 		player-> touching_floor = 0;
@@ -132,7 +148,8 @@ void update_location(player *player, plataform *map_vector[], int plataform_coun
 		player-> vY = max_fall;
 		
 	player-> y += player-> vY;
-		
+	
+	
 	if (collision_y(player, map_vector, plataform_count, &indexCollision, *camera_xF) == 1) 
 	{
 		if (player-> vY >= 0)
@@ -146,23 +163,56 @@ void update_location(player *player, plataform *map_vector[], int plataform_coun
 		player-> vY = 0;
 	}			
 				
+	if (player-> y - player-> h/2 < 0)
+	{
+		player-> y = player-> h/2;
+		player-> vY = 0;
+	}
+	
+	
 	if (check_trapsY(player, trap_vector, trap_count, &indexTraps, *camera_xF) == 1 && player-> is_invinceble == 0)	
-		trap_efect(trap_vector[indexTraps]-> type, player);	
+	{	
+		if (trap_vector[indexTraps]-> type == 5 && trap_vector[indexTraps]-> status == 0)
+		{
+			{
+				if (player-> vY >= 0)
+				{
+					player-> y = trap_vector[indexTraps]-> y - player-> h/2 - 20;
+					player-> touching_floor = 1;
+				}
+				else  
+					player-> y = trap_vector[indexTraps]-> y + map_vector[indexTraps]-> h + player-> h/2;
+		
+				player-> vY = 0;
+			}			
+				
+			if (player-> y - player-> h/2 < 0)
+			{
+				player-> y = player-> h/2;
+				player-> vY = 0;
+			}
+		}
+		
+		trap_efect(trap_vector[indexTraps], player);	
+	}
 			
 		else if (player-> is_invinceble == 1)
-				player-> life_cooldown--;
+		{		
+			player-> life_cooldown--;
+			player-> status = 3;
+		}
+		
 		if (player-> life_cooldown == 0)
 		{	
+			player-> status = 0;
 			player-> is_invinceble = 0;
 			player-> life_cooldown = 60;
 		}
 	
-		
-	
 	return;
 }
 
-void update_game_state(int *gameState, ALLEGRO_FONT* font)
+void update_game_state(int *gameState, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* gameover)
 {
    switch (*gameState)
     {
@@ -170,12 +220,11 @@ void update_game_state(int *gameState, ALLEGRO_FONT* font)
         break;
     
     case 1:
-        al_draw_text(font, al_map_rgb(255, 255, 255),10, 10,ALLEGRO_ALIGN_LEFT, "VOCE MORREU");  
-        al_draw_text(font, al_map_rgb(255, 255, 255),50, 50,ALLEGRO_ALIGN_LEFT, "pressione enter para jogar de novo");  
+        al_draw_scaled_bitmap(gameover, 0, 0, 480, 320, 0,0 ,window_w,window_h, 0);  
 		break;
 	
 	default:
-        al_draw_text(font, al_map_rgb(255, 255, 255),10, 10,ALLEGRO_ALIGN_LEFT, "Pressione ENTER para jogar");  
+        al_draw_scaled_bitmap(menu, 0, 0, 960, 540, 0,0 ,window_w,window_h, 0);  
        	break;
     }
 }
@@ -191,16 +240,24 @@ int main(){
 
 	ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);								//Cria o relógio do jogo; isso indica quantas atualizações serão realizadas por segundo (30, neste caso)
 	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();							//Cria a fila de eventos; todos os eventos (programação orientada a eventos) 
-	ALLEGRO_FONT* font = al_load_font("fontes/Cavalhatriz.ttf", 16, 0);									//Carrega uma fonte padrão para escrever na tela (é bitmap, mas também suporta adicionar fontes ttf)
+								//Carrega uma fonte padrão para escrever na tela (é bitmap, mas também suporta adicionar fontes ttf)
 	
 	ALLEGRO_DISPLAY* disp = al_create_display(window_w, window_h);
 	ALLEGRO_BITMAP *backgroundBack = al_load_bitmap("Layers/back.png");
 	ALLEGRO_BITMAP *backgroundMiddle = al_load_bitmap("Layers/middle.png");	
 	ALLEGRO_BITMAP *plataformTexture = al_load_bitmap("Layers/tiles.png");
-	ALLEGRO_BITMAP *playerSprite = al_load_bitmap("playerAnimation/pixil-frame-0(6).png");
+	ALLEGRO_BITMAP *playerSprite = al_load_bitmap("playerAnimation/pixil-frame-0(14).png");
 	ALLEGRO_BITMAP *lifeSprite = al_load_bitmap("hearts/heart_spritesheet_32x32.png");
 
 	ALLEGRO_BITMAP *spikesSprite = al_load_bitmap("traps/16-bit-spike-Sheet.png");
+	ALLEGRO_BITMAP *ladderSprite = al_load_bitmap("traps/pixil-frame-0(13).png");
+	ALLEGRO_BITMAP *fireSprite = al_load_bitmap("traps/pixil-frame-0(15).png");
+	ALLEGRO_BITMAP *slimeSprite = al_load_bitmap ("traps/slime_blob_spritesheet.png");
+	ALLEGRO_BITMAP *dropPlataformSprite = al_load_bitmap ("traps/pixil-frame-0(17).png");
+	
+
+	ALLEGRO_BITMAP *menu = al_load_bitmap("Telas/xitake_menu(2).png");
+	ALLEGRO_BITMAP *gameover = al_load_bitmap ("Telas/xitake_gameover(2).png");
 
 	
 	al_register_event_source(queue, al_get_keyboard_event_source());				//Indica que eventos de teclado serão inseridos na nossa fila de eventos
@@ -239,7 +296,7 @@ int main(){
 	player *player = create_player(48, 48, 50, window_h/2, window_w, window_h);
 	plataform *floor = create_plataform(0, (window_h - floor_h - player->h/2), window_w, floor_h);
 	plataform **map_vector = create_mapvector(map_vector, floor_w, floor_h, &plataform_count, window_h);
-	trap **trap_vector = create_trapvector(trap_vector, &trap_count,spikesSprite, window_h ,floor_h);
+	trap **trap_vector = create_trapvector(trap_vector, &trap_count,spikesSprite, ladderSprite, window_h ,floor_h);
 
 	
 	ALLEGRO_EVENT event;															//Variável que guarda um evento capturado, sua estrutura é definida em: https://www.allegro.cc/manual/5/ALLEGRO_EVENT
@@ -263,10 +320,18 @@ int main(){
 				//FloorParallax (camera_xF, camera_countF, floor_w, floor_h, plataformTexture,window_h, map_vector, 3);
 
 				for(int i = 0; i < plataform_count; i++)
-					al_draw_scaled_bitmap(plataformTexture, 16, 11, 64, 64, map_vector[i]->x-camera_xF, map_vector[i]->y, floor_w*1.5, floor_h*1.5, 0);
-			
-   				for (int i = 0; i< trap_count; i++)
-					print_trap(trap_vector[i], camera_xF, spikesSprite);
+				{	
+					if (map_vector[i]-> type == 2)
+						al_draw_scaled_bitmap(plataformTexture, 16, 11, 64, 64, map_vector[i]->x-camera_xF, map_vector[i]->y, floor_w*1.5, floor_h*1.5, 0);
+					
+					if (map_vector[i]-> type == 1)
+						al_draw_scaled_bitmap(plataformTexture, 93, 11, 64, 64, map_vector[i]->x-camera_xF, map_vector[i]->y, floor_w*1.6, floor_h*1.6, 0);
+				}
+				
+				reset_drop_plataforms (trap_vector,trap_count,player);
+				
+				for (int i = 0; i< trap_count; i++)
+					print_trap(trap_vector[i], camera_xF, spikesSprite, ladderSprite, fireSprite, slimeSprite,dropPlataformSprite, map_vector, plataform_count,player);
 				
 				for(int i = 1; i <= player-> life; i++)
 					al_draw_scaled_bitmap(lifeSprite, 0, 0, 32, 32, 35*i ,35,32,32,0);
@@ -283,10 +348,10 @@ int main(){
 			if (player-> y - player-> h/2 > window_h || player-> life <= 0)
 			{	
 				gameState = 1;
-				soft_reset(player, &camera_xM, &camera_xB,&camera_xF, window_h);
+				soft_reset(player, &camera_xM, &camera_xB,&camera_xF, window_h, trap_vector, trap_count);
 			}
 			
-			update_game_state(&gameState, font);
+			update_game_state(&gameState, menu, gameover);
 			al_flip_display();														//Insere as modificações realizadas nos buffers de tela
 		
 		}	
@@ -303,7 +368,7 @@ int main(){
 		else if (event.type == 42) break;											//Evento de clique no "X" de fechamento da tela. Encerra o programa graciosamente.
 	}
 
-	al_destroy_font(font);															//Destrutor da fonte padrão
+															//Destrutor da fonte padrão
 	al_destroy_display(disp);														//Destrutor da tela
 	al_destroy_timer(timer);														//Destrutor do relógio
 	al_destroy_event_queue(queue);

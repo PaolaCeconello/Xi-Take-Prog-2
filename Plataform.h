@@ -12,6 +12,7 @@ typedef struct
     float y;
     float w;
     float h;
+    int type;
     
 } plataform;
 
