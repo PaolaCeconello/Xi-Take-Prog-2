@@ -15,4 +15,5 @@
 void soft_reset(player* player, int *camera_xM, int *camera_xB, int *camera_xF, int window_h, trap *trap_vector[], int trap_count, int *plus_life);
 
 void reset_drop_plataforms (trap* trap_vector[], int trap_count, player *player);
+
 #endif

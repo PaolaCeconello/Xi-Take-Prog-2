@@ -211,14 +211,14 @@ int check_trapsY(player* player, trap* trap_vector[], int trap_count, int *index
 void trap_efect (trap* trap, player* player)
 {
     switch (trap-> type)
-        {
+    {
         case 1:
             player-> life--;
             player-> vY = -15;
             player-> x = player-> x -5;
             player-> is_invinceble = 1;
             
-        break;
+            break;
     
         case 2:
            
@@ -231,7 +231,7 @@ void trap_efect (trap* trap, player* player)
             player-> y = player-> y - PLAYER_STEP;
         }
        
-        break;
+            break;
         
         case 3:
             
@@ -243,7 +243,7 @@ void trap_efect (trap* trap, player* player)
             player-> is_invinceble = 1;
         }
             
-        break;
+            break;
         
         case 4:
         {
@@ -253,7 +253,7 @@ void trap_efect (trap* trap, player* player)
             player-> is_invinceble = 1;
         }
 
-        break;
+            break;
         
         case 5:
         {
@@ -265,11 +265,8 @@ void trap_efect (trap* trap, player* player)
                 trap-> status = 1;
         }
     
-        break;
-
-        default:
             break;
-        }
+    }
 }
 
 void print_trap (trap *trap, int camera_xF, ALLEGRO_BITMAP *spikesSprite, ALLEGRO_BITMAP *ladderSprite, ALLEGRO_BITMAP *fireSprite, ALLEGRO_BITMAP *slimeSprite, ALLEGRO_BITMAP *dropPlataformSprite, plataform *map_vector[], int plataform_count, player *player)
@@ -280,10 +277,12 @@ void print_trap (trap *trap, int camera_xF, ALLEGRO_BITMAP *spikesSprite, ALLEGR
         al_draw_scaled_bitmap(spikesSprite, 0, 0, 16, 16, trap-> x-camera_xF, trap->y, 32,32 , 0);
         al_draw_scaled_bitmap(spikesSprite, 0, 0, 16, 16, trap-> x-camera_xF+32, trap->y, 32,32 , 0);
         al_draw_scaled_bitmap(spikesSprite, 0, 0, 16, 16, trap-> x-camera_xF+64, trap->y, 32,32 , 0);
+        
         break;
     
     case 2: 
         al_draw_scaled_bitmap(ladderSprite, 0, 0, 48, 48, trap-> x-camera_xF, trap->y + 2, 48*1.5 ,48*1.5, 0);
+        
         break;
     
     case 3:
@@ -304,7 +303,7 @@ void print_trap (trap *trap, int camera_xF, ALLEGRO_BITMAP *spikesSprite, ALLEGR
         
         al_draw_scaled_bitmap(slimeSprite, source_xslime, 32, 32,32, trap-> x- camera_xF, trap-> y, 32*3,32*3,ALLEGRO_FLIP_HORIZONTAL);
     
-    break;
+        break;
 
     case 5: 
       
@@ -322,7 +321,7 @@ void print_trap (trap *trap, int camera_xF, ALLEGRO_BITMAP *spikesSprite, ALLEGR
                 }
         }
     
-    break;
+        break;
     }
 }
 

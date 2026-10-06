@@ -6,6 +6,8 @@
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #include "Player.h"
 #include "Plataform.h"
 #include "BackGroundParallax.h"
@@ -48,7 +50,6 @@ void update_location(player *player, plataform *map_vector[], int plataform_coun
 			*camera_xF -= camera_speedF;
 		}
 	
-		
 		if (collision_x(player, map_vector, plataform_count, &indexCollision, *camera_xF) == 1)
 			player-> x = map_vector[indexCollision]-> x - 40 - *camera_xF + map_vector[indexCollision]-> w + player-> w/2;
 
@@ -58,6 +59,7 @@ void update_location(player *player, plataform *map_vector[], int plataform_coun
 			
 		else if (player-> is_invinceble == 1)
 				player-> life_cooldown--;
+		
 		if (player-> life_cooldown == 0)
 		{	
 			player-> status = 0;
@@ -79,27 +81,24 @@ void update_location(player *player, plataform *map_vector[], int plataform_coun
 			*camera_xF += camera_speedF;																																				//Move o quadrado do primeiro jogador para a direta
 		}
 	
-		
 		if (collision_x(player, map_vector, plataform_count, &indexCollision, *camera_xF) == 1)
 			player-> x = map_vector[indexCollision]-> x - 40 - *camera_xF - player-> w/2;
 
 		if (check_trapsX(trap_vector,trap_count,player,*camera_xF, &indexTraps) == 1 && player-> is_invinceble == 0)
 			trap_efect(trap_vector[indexTraps], player);
 		
-				
-			
 		else if (player-> is_invinceble == 1)
 		{		
 			player-> life_cooldown--;
 			player-> status = 3;
 		}
+		
 		if (player-> life_cooldown == 0)
 		{	
 			player-> status = 0;
 			player-> is_invinceble = 0;
 			player-> life_cooldown = 60;
 		}
-		
 	}
 	
 	if (player->control-> down)
@@ -115,7 +114,6 @@ void update_location(player *player, plataform *map_vector[], int plataform_coun
 		if (check_trapsX(trap_vector,trap_count,player,*camera_xF, &indexTraps) == 1 && player-> is_invinceble == 0)
 			trap_efect(trap_vector[indexTraps], player);	
 		
-			
 		else if (player-> is_invinceble == 1)
 		{		
 			player-> life_cooldown--;
@@ -129,7 +127,8 @@ void update_location(player *player, plataform *map_vector[], int plataform_coun
 			player-> life_cooldown = 60;
 		}
 	}	
-	else if (player->status == 2 && player->current_frame > 0 && collision_top(map_vector, player,plataform_count, *camera_xF) == 0) 
+	
+	else if (player->status == 2 && player->current_frame > 0) 
     {	
 		player->status = 2; 
 		player->h = 48;
@@ -147,7 +146,6 @@ void update_location(player *player, plataform *map_vector[], int plataform_coun
 		player-> vY = max_fall;
 		
 	player-> y += player-> vY;
-	
 	
 	if (collision_y(player, map_vector, plataform_count, &indexCollision, *camera_xF) == 1) 
 	{
@@ -194,7 +192,6 @@ void update_location(player *player, plataform *map_vector[], int plataform_coun
 		
 		trap_efect(trap_vector[indexTraps], player);	
 	}
-			
 		else if (player-> is_invinceble == 1)
 		{		
 			player-> life_cooldown--;
@@ -211,23 +208,50 @@ void update_location(player *player, plataform *map_vector[], int plataform_coun
 	return;
 }
 
-void update_game_state(int *gameState, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* gameover)
+void change_volume (ALLEGRO_SAMPLE_INSTANCE *musica, float volume)
+{
+	if (volume < 0.0) 
+		volume = 0.0;
+    if (volume > 100.0) 
+		volume = 100.0;
+
+	float volume_allegro = volume / 100.0;
+
+    al_set_sample_instance_gain(musica, volume_allegro);
+}
+
+void update_game_state(player *player, int *camera_xM, int *camera_xB,int *camera_xF, trap* trap_vector[], int trap_count, int *plus_life,int *gameState, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* gameover, float *volume, ALLEGRO_BITMAP *orange, ALLEGRO_BITMAP *victory, ALLEGRO_BITMAP *settings)
 {
    switch (*gameState)
-    {
+	{
     case 67:
         break;
     
     case 1:
-        al_draw_scaled_bitmap(gameover, 0, 0, 480, 320, 0,0 ,window_w,window_h, 0);  
+        al_draw_scaled_bitmap(gameover, 0, 0, 960, 540, 0,0 ,window_w,window_h, 0);  
 		break;
 	
 	case 59:
         al_draw_scaled_bitmap(menu, 0, 0, 960, 540, 0,0 ,window_w,window_h, 0);
+		soft_reset(player, camera_xM, camera_xB, camera_xF, window_h, trap_vector, trap_count, plus_life);
 		break;
 
 	case 2: 
+		al_draw_scaled_bitmap(victory, 0, 0, 960, 540, 0,0 ,window_w,window_h, 0);
 		break;
+
+	case 15:
+		int volume_atual = (int)(*volume / 10);
+		
+		al_draw_scaled_bitmap(settings, 0, 0, 960, 540, 0,0 ,window_w,window_h, 0);
+		
+		for (int i = 0; i< volume_atual; i++)
+		{
+			int x = 70+(i*80);
+			al_draw_scaled_bitmap(orange, 0, 0, 16, 16,x,250,16*5,16*5, 0);
+		}
+		break;
+		
     }
 }
 
@@ -238,34 +262,44 @@ int main(){
 	al_init_image_addon();
 	al_init_primitives_addon(); 
 	al_init_font_addon(); 
-   	al_init_ttf_addon();  															
+   	al_init_ttf_addon();
+	al_install_audio();
+	al_init_acodec_addon();
+	al_reserve_samples(1); 															
 
 	ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);								
 	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();							
 								
 	ALLEGRO_DISPLAY* disp = al_create_display(window_w, window_h);
-	ALLEGRO_BITMAP *backgroundBack = al_load_bitmap("Layers/back.png");
-	ALLEGRO_BITMAP *backgroundMiddle = al_load_bitmap("Layers/middle.png");	
-	ALLEGRO_BITMAP *plataformTexture = al_load_bitmap("Layers/tiles.png");
+	ALLEGRO_BITMAP *backgroundBack = al_load_bitmap("Background/back.png");
+	ALLEGRO_BITMAP *backgroundMiddle = al_load_bitmap("Background/middle.png");	
+	ALLEGRO_BITMAP *plataformTexture = al_load_bitmap("Background/tiles.png");
+	
 	ALLEGRO_BITMAP *playerSprite = al_load_bitmap("playerAnimation/pixil-frame-0(14).png");
-	ALLEGRO_BITMAP *lifeSprite = al_load_bitmap("hearts/heart_spritesheet_32x32.png");
-	ALLEGRO_BITMAP *orange = al_load_bitmap ("hearts/fruit_orange_slice.png");
-	ALLEGRO_BITMAP *chest = al_load_bitmap ("hearts/Icons_14.png");
-
-	ALLEGRO_BITMAP *spikesSprite = al_load_bitmap("traps/16-bit-spike-Sheet.png");
-	ALLEGRO_BITMAP *ladderSprite = al_load_bitmap("traps/pixil-frame-0(13).png");
-	ALLEGRO_BITMAP *fireSprite = al_load_bitmap("traps/pixil-frame-0(15).png");
-	ALLEGRO_BITMAP *slimeSprite = al_load_bitmap ("traps/slime_blob_spritesheet.png");
-	ALLEGRO_BITMAP *dropPlataformSprite = al_load_bitmap ("traps/pixil-frame-0(17).png");
 	
+	ALLEGRO_BITMAP *lifeSprite = al_load_bitmap("Objects/heart_spritesheet_32x32.png");
+	ALLEGRO_BITMAP *orange = al_load_bitmap ("Objects/fruit_orange_slice.png");
+	ALLEGRO_BITMAP *chest = al_load_bitmap ("Objects/Icons_14.png");
 
+	ALLEGRO_BITMAP *spikesSprite = al_load_bitmap("Traps/16-bit-spike-Sheet.png");
+	ALLEGRO_BITMAP *ladderSprite = al_load_bitmap("Traps/pixil-frame-0(13).png");
+	ALLEGRO_BITMAP *fireSprite = al_load_bitmap("Traps/pixil-frame-0(15).png");
+	ALLEGRO_BITMAP *slimeSprite = al_load_bitmap ("Traps/slime_blob_spritesheet.png");
+	ALLEGRO_BITMAP *dropPlataformSprite = al_load_bitmap ("Traps/pixil-frame-0(17).png");
+	
 	ALLEGRO_BITMAP *menu = al_load_bitmap("Telas/xitake_menu(2).png");
-	ALLEGRO_BITMAP *gameover = al_load_bitmap ("Telas/xitake_gameover(2).png");
+	ALLEGRO_BITMAP *gameover = al_load_bitmap ("Telas/xitake_gameover_final.png");
+	ALLEGRO_BITMAP *victory = al_load_bitmap ("Telas/xitake_victory.png");
+	ALLEGRO_BITMAP *settings = al_load_bitmap ("Telas/xitake_settings.png");
 
-	
+	ALLEGRO_SAMPLE *musica_og = al_load_sample("Music/19-Where-The-Winds-Roam.ogg");
+	ALLEGRO_SAMPLE_INSTANCE *musica = al_create_sample_instance(musica_og);
+
 	al_register_event_source(queue, al_get_keyboard_event_source());				
 	al_register_event_source(queue, al_get_display_event_source(disp));				
-	al_register_event_source(queue, al_get_timer_event_source(timer));				
+	al_register_event_source(queue, al_get_timer_event_source(timer));	
+	al_set_sample_instance_playmode(musica, ALLEGRO_PLAYMODE_LOOP);	
+	al_attach_sample_instance_to_mixer(musica, al_get_default_mixer());		
 
 	float bgBack_h = al_get_bitmap_height(backgroundBack);
 	float bgBack_w = al_get_bitmap_width(backgroundBack);
@@ -293,11 +327,13 @@ int main(){
 	int source_y;
 	
 	int gameState = 59;
+	float volume = 50.0;
 	
 	player *player = create_player(48, 48, 120, window_h/2, window_w, window_h);
 	plataform **map_vector = create_mapvector(map_vector, floor_w, floor_h, &plataform_count, window_h);
 	trap **trap_vector = create_trapvector(trap_vector, &trap_count,spikesSprite, ladderSprite, window_h ,floor_h);
 
+	al_play_sample_instance(musica);
 	
 	ALLEGRO_EVENT event;															
 	al_start_timer(timer);															
@@ -315,8 +351,7 @@ int main(){
 
 				BackGroundParallax(camera_xB, camera_countB, bgBack_w, bgBack_h, bgBackAjustado, backgroundBack, window_h);
 				MiddleGroundParallax(camera_xM, camera_countM,bgMiddle_w, bgMiddle_h, bgMiddleAjustado, backgroundMiddle, window_h);
-				//FloorParallax (camera_xF, camera_countF, floor_w, floor_h, plataformTexture,window_h, map_vector, 3);
-
+				
 				for(int i = 0; i < plataform_count; i++)
 				{	
 					if (map_vector[i]-> type == 2)
@@ -351,11 +386,10 @@ int main(){
 				if ((player-> y + player-> h/2) > (420) 
         		&& (player-> y - player-> h/2) < (420 + 32)
         		&& (player-> x + player-> w/2) > (5000 - camera_xF)
-        		&& (player-> x - player-> w/2) < (5000- camera_xF + 32) && plus_life == 0)
+        		&& (player-> x - player-> w/2) < (5000- camera_xF + 32))
 				{
 					gameState = 2;
 				}
-				
 				
 				player_animation (player);
 				
@@ -366,15 +400,20 @@ int main(){
 				al_draw_scaled_bitmap(playerSprite, source_x, source_y, 48, 48,player-> x-player-> w/2, player-> y-player-> h/2,96,96, ALLEGRO_FLIP_HORIZONTAL);
 			}
 			
-			if (player-> y - player-> h/2 > window_h || player-> life <= 0)
+			if (player-> y - player-> h/2 > window_h)
+			{
+				gameState = 67;
+				player-> life -= 1;
+			}
+			
+			if (player-> life <= 0)
 			{	
 				gameState = 1;
 				soft_reset(player, &camera_xM, &camera_xB,&camera_xF, window_h, trap_vector, trap_count, &plus_life);
 			}
 			
-			update_game_state(&gameState, menu, gameover);
+			update_game_state(player, &camera_xM, &camera_xB, &camera_xF,trap_vector,trap_count, &plus_life, &gameState, menu, gameover, &volume, orange,victory, settings);
 			al_flip_display();														
-		
 		}	
 			
 		else if ((event.type == 10) || (event.type == 12))
@@ -382,19 +421,43 @@ int main(){
 			if (event.keyboard.keycode == 1) joystick_left(player-> control);																															
 			else if (event.keyboard.keycode == 4) joystick_right(player-> control);																													
 			else if (event.keyboard.keycode == 23) joystick_up(player-> control);																
-						else if (event.keyboard.keycode == 19) joystick_down(player-> control);
+			else if (event.keyboard.keycode == 19) joystick_down(player-> control);
 			else if (event.keyboard.keycode == 67) gameState = 67;
-			else if (event.keyboard.keycode == 59) gameState = 59;																													//Indica o evento correspondente no controle do primeiro jogador (botão de movimentação para baixo)
+			else if (event.keyboard.keycode == 59) gameState = 59;
+			else if (event.keyboard.keycode == 15) gameState = 15;
+			if (event.type == ALLEGRO_EVENT_KEY_DOWN) 
+			{
+    			switch(event.keyboard.keycode) 
+				{
+        			case ALLEGRO_KEY_UP: 
+            		
+					if (volume < 100.0)
+						volume += 10.0; 
+            		change_volume(musica, volume);
+            		
+            		break;
+
+        			case ALLEGRO_KEY_DOWN: 
+            		
+					if (volume > 0.0)
+						volume -= 10.0; 
+            		change_volume(musica, volume);
+            		
+            		break;
+    			}
+			}																													//Indica o evento correspondente no controle do primeiro jogador (botão de movimentação para baixo)
 		}
 			
 		else if (event.type == 42) break;											
 	}
 
-															
 	al_destroy_display(disp);														
 	al_destroy_timer(timer);														
 	al_destroy_event_queue(queue);
 	al_shutdown_primitives_addon();
+	
+	al_destroy_sample_instance(musica);
+	al_destroy_sample(musica_og);
 	
 	destroy_traps (trap_vector,trap_count);
 	destroy_plataform(map_vector, plataform_count);

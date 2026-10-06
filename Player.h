@@ -33,8 +33,9 @@ typedef struct
 } player;																																			//Definição do nome da estrutura
 
 player* create_player(unsigned short h, unsigned short w, unsigned short x, unsigned short y, unsigned short max_x, unsigned short max_y);		//Protótipo da função de criação de um quadrado
+
 void player_move(player *element, char steps, unsigned char trajectory, unsigned short max_x, unsigned short max_y);					                                  //Protótipo da função de movimentação de um quadrado
-void draw_player(player* player);
+
 void destroy_player(player *element);																												//Protótipo da função de destruição de um quadrado
 
 #endif

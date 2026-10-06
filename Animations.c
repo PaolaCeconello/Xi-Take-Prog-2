@@ -19,7 +19,7 @@ void player_animation (player* player)
         if (player->current_frame >= player->max_frames) 
             player->current_frame = 0;
 
-    break;
+        break;
        
     case 1:
         player-> max_frames = 9;
@@ -35,7 +35,7 @@ void player_animation (player* player)
         if (player->current_frame >= player->max_frames) 
             player->current_frame = 0;
             
-    break;
+        break;
     
     case 2:
     
@@ -81,7 +81,7 @@ void player_animation (player* player)
         if (player->current_frame >= player->max_frames) 
             player->current_frame = 0;
 
-     case 4:
+        case 4:
         
         player-> max_frames = 9;
 
@@ -96,24 +96,18 @@ void player_animation (player* player)
         if (player->current_frame >= player->max_frames) 
             player->current_frame = 0;
 
-    break;
-    
-    default:
-        
         break;
     }
 }
 
 void fire_animation (trap* trap)
 {
-    
     if (trap-> is_on == 0 && trap-> cooldown == 0)
     {    
         trap-> is_on = 1;
         trap-> current_frame = 0;
     }
-    else 
-    if (trap-> is_on == 0 && trap->cooldown > 0)
+    else if (trap-> is_on == 0 && trap->cooldown > 0)
     {
         trap-> current_frame = 13;
         trap-> frame_count = 0;
@@ -137,8 +131,6 @@ void fire_animation (trap* trap)
         trap-> is_on = 0;
         trap-> cooldown = 90;
     }
-
-    return;
 }
 
 void slime_animation (trap *trap, plataform *map_vector[], int plataform_count, int camera_xF)

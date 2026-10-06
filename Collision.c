@@ -18,7 +18,6 @@ int collision_x (player* player, plataform* map_vector[], int plataform_count, i
         && (player-> x + player-> w/2) > (map_vector[i]-> x - 40 - camera_xF)
         && (player-> x - player-> w/2) < (map_vector[i]-> x - 40 - camera_xF + map_vector[i]-> w))
         {    
-          
             if (playerRight < plataformRight)
                 overlap_x = playerRight - (map_vector[i]-> x - camera_xF - 40);
             else 
@@ -32,8 +31,7 @@ int collision_x (player* player, plataform* map_vector[], int plataform_count, i
             }
         }
     }    
-        //if((player-> y + player-> h/2) > map_vector[i]-> y + map_vector[i]-> h/2)
-        //return (1);
+    
     return(found);
 }
 
@@ -70,30 +68,7 @@ int collision_y(player* player, plataform* map_vector[], int plataform_count, in
             }
         }
     }    
-        //if((player-> y + player-> h/2) > map_vector[i]-> y + map_vector[i]-> h/2)
-        //return (1);
     return(found);
 }
 
-int collision_top (plataform *map_vector[], player *player, int plataform_count, int camera_xF)
-{
-    for (int i = 0; i < plataform_count; i++)
-    {
-        float playerTop    = player->y - player->h / 2;  // usa h real, não hardcoded
-        float platBottom   = map_vector[i]->y + map_vector[i]->h;
-        float platLeft     = map_vector[i]->x - 40 - camera_xF;  // consistente com o resto
-        float platRight    = platLeft + map_vector[i]->w;
 
-        // Jogador está logo abaixo da plataforma (cabeça a até 8px da base dela)
-        // e horizontalmente alinhado
-        if (playerTop >= map_vector[i]->y        // cabeça não passou pelo topo
-        && playerTop <= platBottom + 8            // cabeça encostando na base
-        && (player->x + player->w / 2) > platLeft
-        && (player->x - player->w / 2) < platRight)
-        {
-            return 1;
-        }
-    }
-    return 0;
-
-}

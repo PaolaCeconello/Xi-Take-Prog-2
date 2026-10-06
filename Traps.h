@@ -40,4 +40,5 @@ void trap_efect (trap* trap, player* player);
 void print_trap (trap *trap, int camera_xF, ALLEGRO_BITMAP *spikesSprite, ALLEGRO_BITMAP *ladderSprite, ALLEGRO_BITMAP *fireSprite, ALLEGRO_BITMAP *slimeSprite, ALLEGRO_BITMAP *dropPlataformSprite, plataform *map_vector[], int plataform_count, player*player);
 
 void destroy_traps (trap *trap_vector[], int trap_count);
+
 #endif

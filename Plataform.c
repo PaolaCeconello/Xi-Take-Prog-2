@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
+
 #include "Plataform.h"
 
 plataform** create_mapvector(plataform *map_vector[], int floor_w, int floor_h, int *plataform_count, int window_h)
@@ -30,7 +29,6 @@ plataform** create_mapvector(plataform *map_vector[], int floor_w, int floor_h, 
     for(int n = 0; n < index; n++)
         map_vector[n] = malloc(sizeof(plataform));
     
-    
     *plataform_count = index;
     index = 0;
     
@@ -44,7 +42,6 @@ plataform** create_mapvector(plataform *map_vector[], int floor_w, int floor_h, 
                 map_vector[index]-> x = j * floor_w * 1.5;
                 map_vector[index]-> y = window_h - (floor_h);
                 map_vector[index]-> type = 1;
-                
                 
                 index++;
             }
@@ -70,7 +67,6 @@ plataform** create_mapvector(plataform *map_vector[], int floor_w, int floor_h, 
                 
                 index++;
             }
-        
         }
     
     return(map_vector);

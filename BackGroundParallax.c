@@ -1,10 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <allegro5/allegro5.h>														
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_image.h>
 
-#include "Plataform.h"
+#include "BackGroundParallax.h"
 
 void FloorParallax (int camera_x, int camera_count, float floor_w, float floor_h, ALLEGRO_BITMAP *plataformTexture,int window_h, plataform* map_vector, int index)
 {
@@ -21,7 +16,6 @@ void FloorParallax (int camera_x, int camera_count, float floor_w, float floor_h
 			al_draw_scaled_bitmap(plataformTexture, 0, 0, floor_w, floor_h, x, (window_h - floor_h), floor_w, floor_h, 0);
 			i++;
 		}
-    return;
 }
 
 void MiddleGroundParallax (int camera_x, int camera_count, float bgMiddle_w, float bgMiddle_h, float bgMiddleAjustado, ALLEGRO_BITMAP *backgroundMiddle,int window_h)
@@ -40,7 +34,6 @@ void MiddleGroundParallax (int camera_x, int camera_count, float bgMiddle_w, flo
 			
 			i++;
 		}
-    return;
 }
 
 void BackGroundParallax (int camera_x, int camera_count, float bgBack_w, float bgBack_h, float bgBackAjustado, ALLEGRO_BITMAP *backgroundBack,int window_h)
@@ -59,7 +52,6 @@ void BackGroundParallax (int camera_x, int camera_count, float bgBack_w, float b
 			
 			i++;
 		}
-    return;
 }
 
 void destroy_backgorund (ALLEGRO_BITMAP *plataformTexture, ALLEGRO_BITMAP *backgroundMiddle, ALLEGRO_BITMAP *backgroundBack)
@@ -67,6 +59,4 @@ void destroy_backgorund (ALLEGRO_BITMAP *plataformTexture, ALLEGRO_BITMAP *backg
 	al_destroy_bitmap(backgroundBack);		
 	al_destroy_bitmap(backgroundMiddle);
 	al_destroy_bitmap(plataformTexture);
-
-	return;
 }
