@@ -21,8 +21,8 @@ Jogo 2D de plataforma singleplayer desenvolvido em C usando a biblioteca Allegro
 
 ## Como rodar
 ```bash
-git clone https://github.com/PaolaCeconello/a3.git
-cd a3
+git clone https://github.com/PaolaCeconello/Xi-Take-Prog-2.git
+cd Xi-Take-Prog-2
 make
 ./jogo
 ```
