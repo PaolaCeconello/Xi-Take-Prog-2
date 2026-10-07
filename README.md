@@ -1,6 +1,6 @@
 # Xi Take
 
-Jogo 2D de plataforma singleplayer desenvolvido em C usando a biblioteca Allegro 5 para a disciplica de Programação 2, cursado em 2026.1 na Universidade Federal do Paraná.
+Jogo 2D de plataforma singleplayer desenvolvido em C usando a biblioteca Allegro 5 para a disciplica de Programação 2, cursada em 2026.1 na Universidade Federal do Paraná.
 
 <img width="1092" height="614" alt="a3-ezgif com-optimize" src="https://github.com/user-attachments/assets/f3fe56d7-62fd-45bc-be10-86644fe150d2" />
 
